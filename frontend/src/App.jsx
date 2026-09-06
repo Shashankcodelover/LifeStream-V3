@@ -8,6 +8,7 @@ import { ClinicalMTPView } from './components/ClinicalMTPView';
 import { PredictiveForecasterView } from './components/PredictiveForecasterView';
 import { CommunityView } from './components/CommunityView';
 import { DeliveryTrackerView } from './components/DeliveryTrackerView';
+import { AlgorithmStudioView } from './components/AlgorithmStudioView';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { AdminPortalModal } from './components/AdminPortalModal';
@@ -352,7 +353,12 @@ export default function App() {
         />
       )}
 
-      {/* VIEW 5: HERO COMMUNITY & REGIONAL BLOOD DRIVES */}
+      {/* VIEW 5: ALGORITHM STUDIO & VISUAL STATE TRACER */}
+      {activeTab === 'studio' && (
+        <AlgorithmStudioView />
+      )}
+
+      {/* VIEW 6: HERO COMMUNITY & REGIONAL BLOOD DRIVES */}
       {activeTab === 'community' && (
         <CommunityView
           user={user}

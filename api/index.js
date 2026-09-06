@@ -18,6 +18,7 @@ app.use('/api/requests', require('../src/routes/requests'));
 app.use('/api/admin', require('../src/routes/admin'));
 app.use('/api/clinical', require('../src/routes/clinical'));
 app.use('/api/drives', require('../src/routes/drives'));
+app.use('/api/algorithm', require('../src/routes/algorithm'));
 
 // Backward compatibility routes
 app.get('/api/matches/:bloodType', (req, res) => {

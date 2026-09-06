@@ -110,6 +110,18 @@ export function Navbar({
         </button>
 
         <button
+          onClick={() => setActiveTab('studio')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeTab === 'studio'
+              ? 'bg-white text-[#1a73e8] shadow-sm font-bold'
+              : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
+          }`}
+        >
+          <Activity className="w-3.5 h-3.5 text-[#1a73e8]" />
+          <span>Algorithm Studio</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('community')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             activeTab === 'community'
