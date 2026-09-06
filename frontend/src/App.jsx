@@ -200,9 +200,8 @@ export default function App() {
   const handleDispatch = async (donorId, transportType, componentType) => {
     try {
       playDispatchSonar();
-      const res = await fetch('/api/dispatch', {
+      const newDisp = await resilientFetch('/api/dispatch', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           donorId,
           transportType,
@@ -210,11 +209,12 @@ export default function App() {
           hospitalId: selectedHospitalId
         })
       });
-      const newDisp = await res.json();
-      setDispatches(prev => [newDisp, ...prev]);
-      setFocusedDispatchId(newDisp.id);
-      fetchMatches();
-      showToast(`🚀 ${newDisp.transportType} ${newDisp.id} launched with SHA-256 seal.`, 'info');
+      if (newDisp && newDisp.id) {
+        setDispatches(prev => [newDisp, ...prev]);
+        setFocusedDispatchId(newDisp.id);
+        fetchMatches();
+        showToast(`🚀 ${newDisp.transportType} ${newDisp.id} launched with SHA-256 seal.`, 'info');
+      }
     } catch (err) {
       console.error('Dispatch error:', err);
     }
@@ -236,16 +236,13 @@ export default function App() {
   // Hospital Intake Confirmation
   const handleConfirmReceipt = async (dispatchId, nurseName, badgeId) => {
     try {
-      const res = await fetch(`/api/dispatch/${dispatchId}/confirm-receipt`, {
+      await resilientFetch(`/api/dispatch/${dispatchId}/confirm-receipt`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nurseName, badgeId })
       });
-      const data = await res.json();
       pollActiveTelemetry();
       fetchHospitals();
-      fetchMatches();
-      showToast(`✓ Hospital intake logged by ${badgeId}. Blood inventory updated.`, 'success');
+      showToast(`Unit ${dispatchId} verified & added to hospital inventory.`, 'success');
     } catch (err) {
       console.error('Receipt confirmation error:', err);
     }

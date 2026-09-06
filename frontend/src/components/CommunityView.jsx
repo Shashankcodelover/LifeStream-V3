@@ -33,15 +33,13 @@ export function CommunityView({ user, hospitals = [], onOpenAppointments, onOpen
 
   const handleRsvpDrive = async (driveId) => {
     try {
-      const res = await fetch(`/api/drives/${driveId}/rsvp`, {
+      const data = await resilientFetch(`/api/drives/${driveId}/rsvp`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           donorName: user?.name || 'Voluntary Lifesaver',
           bloodType: user?.bloodType || 'O-'
         })
       });
-      const data = await res.json();
       setRsvpFeedback(`✓ RSVP Confirmed! Pass code: ${data.rsvp?.qrPassCode}`);
       setTimeout(() => setRsvpFeedback(null), 4000);
     } catch (e) {

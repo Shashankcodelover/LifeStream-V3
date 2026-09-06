@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, UserPlus, MapPin, CheckCircle2 } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
@@ -14,15 +15,13 @@ export function RegisterDonorModal({ onClose, onRegistered }) {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/donors', {
+      const newDonor = await resilientFetch('/api/donors', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
-      const newDonor = await res.json();
       setSuccess(true);
       setTimeout(() => {
-        onRegistered();
+        if (onRegistered) onRegistered(newDonor);
         onClose();
       }, 1000);
     } catch (err) {

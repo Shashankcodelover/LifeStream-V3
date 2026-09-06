@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Siren, Zap, Hospital, User, Phone, Droplet, CheckCircle, Navigation, AlertTriangle } from 'lucide-react';
 import { playEmergencyBeacon } from '../utils/audioAlerts';
+import { resilientFetch } from '../api/client';
 
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
@@ -25,12 +26,10 @@ export function EmergencyRequestModal({ onClose, hospitals = [], onDispatchMissi
 
     try {
       playEmergencyBeacon();
-      const res = await fetch('/api/requests', {
+      const data = await resilientFetch('/api/requests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
-      const data = await res.json();
       setCreatedTicket(data);
       if (onRequestCreated) onRequestCreated(data);
     } catch (err) {

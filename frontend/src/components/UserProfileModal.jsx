@@ -3,6 +3,7 @@ import {
   X, User, ShieldCheck, Phone, Mail, Droplet, KeyRound,
   LogOut, Save, CheckCircle2, Award, HeartHandshake, MapPin
 } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) {
   const [name, setName] = useState(user?.name || '');
@@ -24,13 +25,8 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
     setSavedMsg(false);
 
     try {
-      const token = localStorage.getItem('lifestream_token');
-      const res = await fetch('/api/auth/profile', {
+      const data = await resilientFetch('/api/auth/profile', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({
           name,
           phone,
@@ -40,7 +36,6 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
           medicalNotes
         })
       });
-      const data = await res.json();
       localStorage.setItem('lifestream_user', JSON.stringify(data));
       setSavedMsg(true);
       if (onProfileUpdated) onProfileUpdated(data);
@@ -57,23 +52,16 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
     if (!currentPass || !newPass) return;
 
     try {
-      const token = localStorage.getItem('lifestream_token');
-      const res = await fetch('/api/auth/change-password', {
+      await resilientFetch('/api/auth/change-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ currentPassword: currentPass, newPassword: newPass })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Password change failed');
 
       setPassMsg({ type: 'success', text: 'Password successfully updated.' });
       setCurrentPass('');
       setNewPass('');
     } catch (err) {
-      setPassMsg({ type: 'error', text: err.message });
+      setPassMsg({ type: 'error', text: err.message || 'Password change failed' });
     }
   };
 

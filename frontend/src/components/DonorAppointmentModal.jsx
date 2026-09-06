@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, Clock, Hospital, CheckCircle2, User, Droplet, Plus } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 const TIME_SLOTS = ['09:00 AM', '10:30 AM', '11:30 AM', '01:30 PM', '03:00 PM', '04:30 PM'];
 const DONATION_TYPES = ['Whole Blood (Standard 500ml)', 'Power Red (Double RBC)', 'Platelets & Plasma Apheresis'];
@@ -17,9 +18,8 @@ export function DonorAppointmentModal({ onClose, user, hospitals = [], onAppoint
 
   const fetchAppointments = async () => {
     try {
-      const res = await fetch('/api/auth/appointments');
-      const data = await res.json();
-      setAppointments(data);
+      const data = await resilientFetch('/api/auth/appointments');
+      setAppointments(data || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -34,9 +34,8 @@ export function DonorAppointmentModal({ onClose, user, hospitals = [], onAppoint
   const handleBook = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/auth/appointments', {
+      const data = await resilientFetch('/api/auth/appointments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           donorName: user?.name || 'Marcus Vance',
           hospitalId,
@@ -45,7 +44,6 @@ export function DonorAppointmentModal({ onClose, user, hospitals = [], onAppoint
           donationType
         })
       });
-      const data = await res.json();
       setBookingSuccess(true);
       fetchAppointments();
       if (onAppointmentBooked) onAppointmentBooked(data);

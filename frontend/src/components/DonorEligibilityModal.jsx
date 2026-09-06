@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, HeartPulse, CheckCircle2, AlertTriangle, ShieldCheck, ArrowRight, UserPlus } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 export function DonorEligibilityModal({ onClose, onClearedForRegistration }) {
   const [form, setForm] = useState({
@@ -18,12 +19,10 @@ export function DonorEligibilityModal({ onClose, onClearedForRegistration }) {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/donors/check-eligibility', {
+      const data = await resilientFetch('/api/donors/check-eligibility', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
-      const data = await res.json();
       setResult(data);
     } catch (err) {
       console.error(err);

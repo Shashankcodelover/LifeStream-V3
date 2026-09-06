@@ -66,12 +66,10 @@ export function AlgorithmStudioView() {
     if (playTimerRef.current) clearInterval(playTimerRef.current);
 
     try {
-      const res = await fetch('/api/algorithm/run', {
+      const data = await resilientFetch('/api/algorithm/run', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, presetId: selectedPresetId })
       });
-      const data = await res.json();
       setExecutionMetrics({
         latencyMicroseconds: data.latencyMicroseconds,
         memoryAllocatedKb: data.memoryAllocatedKb,
@@ -91,12 +89,10 @@ export function AlgorithmStudioView() {
   const handleRunBenchmark = async (suiteId) => {
     setIsExecuting(true);
     try {
-      const res = await fetch(`/api/algorithm/benchmark-suite/${suiteId}`, {
+      const data = await resilientFetch(`/api/algorithm/benchmark-suite/${suiteId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code })
       });
-      const data = await res.json();
       setBenchmarkResult(data);
     } catch (e) {
       console.error(e);

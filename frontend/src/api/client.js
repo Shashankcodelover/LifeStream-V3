@@ -120,8 +120,19 @@ export async function resilientFetch(url, options = {}, retries = 2, timeoutMs =
           } catch (e) {}
         }
         return data;
+      } else {
+        const errData = await response.json().catch(() => ({ message: response.statusText || `HTTP ${response.status}` }));
+        const error = new Error(errData.error || errData.message || `Request failed with status ${response.status}`);
+        error.status = response.status;
+        error.data = errData;
+        throw error;
       }
     } catch (err) {
+      // Never retry client/validation errors (4xx) - surface directly to UI
+      if (err.status && err.status >= 400 && err.status < 500) {
+        throw err;
+      }
+
       if (attempt === retries) {
         console.warn(`[LifeStream Network] Guard engaged for ${url}. Providing semantic cache fallback.`);
 

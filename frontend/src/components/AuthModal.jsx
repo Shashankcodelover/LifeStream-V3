@@ -3,6 +3,7 @@ import {
   X, Lock, Mail, User, ShieldCheck, Zap, Droplet, Hospital,
   ArrowRight, KeyRound, CheckCircle2, UserCheck, Heart
 } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 export function AuthModal({ onClose, onAuthSuccess }) {
   const [tab, setTab] = useState('login'); // login | register | demo
@@ -24,9 +25,8 @@ export function AuthModal({ onClose, onAuthSuccess }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/auth/demo-accounts');
-        const data = await res.json();
-        setDemoAccounts(data);
+        const data = await resilientFetch('/api/auth/demo-accounts');
+        setDemoAccounts(data || []);
       } catch (e) {}
     })();
   }, []);
@@ -40,14 +40,10 @@ export function AuthModal({ onClose, onAuthSuccess }) {
     const password = customPass || loginPassword;
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const data = await resilientFetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || 'Login failed');
 
       localStorage.setItem('lifestream_token', data.token);
       localStorage.setItem('lifestream_user', JSON.stringify(data.user));
@@ -55,7 +51,7 @@ export function AuthModal({ onClose, onAuthSuccess }) {
       if (onAuthSuccess) onAuthSuccess(data.user, data.token);
       onClose();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -67,9 +63,8 @@ export function AuthModal({ onClose, onAuthSuccess }) {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/register', {
+      const data = await resilientFetch('/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: regName,
           email: regEmail,
@@ -79,9 +74,6 @@ export function AuthModal({ onClose, onAuthSuccess }) {
           phone: regPhone
         })
       });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
 
       localStorage.setItem('lifestream_token', data.token);
       localStorage.setItem('lifestream_user', JSON.stringify(data.user));
@@ -89,7 +81,7 @@ export function AuthModal({ onClose, onAuthSuccess }) {
       if (onAuthSuccess) onAuthSuccess(data.user, data.token);
       onClose();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

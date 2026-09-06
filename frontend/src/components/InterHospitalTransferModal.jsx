@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ArrowRightLeft, Hospital, Navigation, AlertTriangle, CheckCircle2, ShieldCheck, Box } from 'lucide-react';
 import { playDispatchSonar } from '../utils/audioAlerts';
+import { resilientFetch } from '../api/client';
 
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
@@ -19,10 +20,9 @@ export function InterHospitalTransferModal({ onClose, currentHospital, onTransfe
 
   const fetchHospitals = async () => {
     try {
-      const res = await fetch('/api/hospitals');
-      const data = await res.json();
-      setHospitals(data);
-      if (data.length > 1 && !sourceHospitalId) {
+      const data = await resilientFetch('/api/hospitals');
+      setHospitals(data || []);
+      if (data && data.length > 1 && !sourceHospitalId) {
         setSourceHospitalId(data.find(h => h.id !== targetHospitalId)?.id || data[1].id);
       }
     } catch (e) {
@@ -35,9 +35,8 @@ export function InterHospitalTransferModal({ onClose, currentHospital, onTransfe
   const fetchSurplusMatches = async () => {
     if (!targetHospitalId) return;
     try {
-      const res = await fetch(`/api/hospitals/surplus/${targetHospitalId}/${selectedBloodType}`);
-      const data = await res.json();
-      setSurplusMatches(data);
+      const data = await resilientFetch(`/api/hospitals/surplus/${targetHospitalId}/${selectedBloodType}`);
+      setSurplusMatches(data || []);
     } catch (e) {
       console.error(e);
     }
@@ -55,9 +54,8 @@ export function InterHospitalTransferModal({ onClose, currentHospital, onTransfe
     setTransferring(true);
     try {
       playDispatchSonar();
-      const res = await fetch('/api/hospitals/transfer', {
+      const data = await resilientFetch('/api/hospitals/transfer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sourceHospitalId: srcId,
           targetHospitalId: tgtId,
@@ -65,14 +63,12 @@ export function InterHospitalTransferModal({ onClose, currentHospital, onTransfe
           units: qty
         })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Transfer failed');
 
       setTransferResult(data);
       if (onTransferInitiated) onTransferInitiated(data.dispatch);
       fetchHospitals();
     } catch (err) {
-      alert(err.message);
+      alert(err.message || 'Transfer failed');
     } finally {
       setTransferring(false);
     }

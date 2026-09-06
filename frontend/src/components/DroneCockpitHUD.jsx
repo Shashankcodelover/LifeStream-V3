@@ -19,13 +19,11 @@ export function DroneCockpitHUD({ dispatch, onClose, onActionFeedback }) {
   const handleCockpitControl = async (command) => {
     setLoadingAction(true);
     try {
-      const res = await fetch(`/api/dispatch/${dispatch.id}/cockpit-control`, {
+      const data = await resilientFetch(`/api/dispatch/${dispatch.id}/cockpit-control`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ command })
       });
-      const data = await res.json();
-      if (data.dispatch?.lastCockpitAction) {
+      if (data?.dispatch?.lastCockpitAction) {
         setHudLogs(prev => [data.dispatch.lastCockpitAction, ...prev.slice(0, 4)]);
       }
       if (onActionFeedback) onActionFeedback(`Cockpit command [${command}] executed.`);

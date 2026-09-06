@@ -4,6 +4,7 @@ import {
   XCircle, Trash2, Plus, RefreshCw, BarChart3, ArrowUpRight, Flame,
   Battery, Thermometer, MapPin, Search, Filter, ShieldCheck, HeartPulse
 } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
@@ -53,18 +54,18 @@ export function AdminPortalModal({ onClose, onDataChange }) {
     setLoading(true);
     try {
       const [statsRes, donorsRes, hospitalsRes, dispatchesRes, alertsRes] = await Promise.all([
-        fetch('/api/admin/stats').then(r => r.json()),
-        fetch(`/api/admin/donors?search=${encodeURIComponent(donorSearch)}&bloodType=${donorBloodFilter}&verified=${donorVerifiedFilter}`).then(r => r.json()),
-        fetch('/api/admin/hospitals').then(r => r.json()),
-        fetch('/api/admin/dispatches').then(r => r.json()),
-        fetch('/api/admin/alerts').then(r => r.json())
+        resilientFetch('/api/admin/stats'),
+        resilientFetch(`/api/admin/donors?search=${encodeURIComponent(donorSearch)}&bloodType=${donorBloodFilter}&verified=${donorVerifiedFilter}`),
+        resilientFetch('/api/admin/hospitals'),
+        resilientFetch('/api/admin/dispatches'),
+        resilientFetch('/api/admin/alerts')
       ]);
 
       setStats(statsRes);
-      setDonors(donorsRes);
-      setHospitals(hospitalsRes);
-      setDispatches(dispatchesRes);
-      setAlerts(alertsRes);
+      setDonors(donorsRes || []);
+      setHospitals(hospitalsRes || []);
+      setDispatches(dispatchesRes || []);
+      setAlerts(alertsRes || []);
     } catch (err) {
       console.error('Error fetching admin data:', err);
     } finally {
@@ -79,9 +80,8 @@ export function AdminPortalModal({ onClose, onDataChange }) {
   // Donor Actions
   const toggleDonorVerification = async (id, currentStatus) => {
     try {
-      await fetch(`/api/admin/donors/${id}`, {
+      await resilientFetch(`/api/admin/donors/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isVerified: !currentStatus })
       });
       fetchAllData();
@@ -94,7 +94,7 @@ export function AdminPortalModal({ onClose, onDataChange }) {
   const deleteDonor = async (id) => {
     if (!confirm('Are you sure you want to remove this donor from the dispatch registry?')) return;
     try {
-      await fetch(`/api/admin/donors/${id}`, { method: 'DELETE' });
+      await resilientFetch(`/api/admin/donors/${id}`, { method: 'DELETE' });
       fetchAllData();
       if (onDataChange) onDataChange();
     } catch (e) {
@@ -106,9 +106,8 @@ export function AdminPortalModal({ onClose, onDataChange }) {
     e.preventDefault();
     if (!newDonor.name) return;
     try {
-      await fetch('/api/admin/donors', {
+      await resilientFetch('/api/admin/donors', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDonor)
       });
       setShowAddDonor(false);
@@ -123,9 +122,8 @@ export function AdminPortalModal({ onClose, onDataChange }) {
   // Hospital Inventory Actions
   const adjustHospitalInventory = async (hospitalId, bloodType, delta) => {
     try {
-      await fetch(`/api/admin/hospitals/${hospitalId}/inventory`, {
+      await resilientFetch(`/api/admin/hospitals/${hospitalId}/inventory`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bloodType, delta })
       });
       fetchAllData();
@@ -139,9 +137,8 @@ export function AdminPortalModal({ onClose, onDataChange }) {
     e.preventDefault();
     if (!newHospital.name) return;
     try {
-      await fetch('/api/admin/hospitals', {
+      await resilientFetch('/api/admin/hospitals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newHospital)
       });
       setShowAddHospital(false);
@@ -156,9 +153,8 @@ export function AdminPortalModal({ onClose, onDataChange }) {
   // Dispatch Actions
   const updateDispatchStatus = async (id, status) => {
     try {
-      await fetch(`/api/admin/dispatches/${id}/status`, {
+      await resilientFetch(`/api/admin/dispatches/${id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
       fetchAllData();
@@ -170,7 +166,7 @@ export function AdminPortalModal({ onClose, onDataChange }) {
 
   const deleteDispatch = async (id) => {
     try {
-      await fetch(`/api/admin/dispatches/${id}`, { method: 'DELETE' });
+      await resilientFetch(`/api/admin/dispatches/${id}`, { method: 'DELETE' });
       fetchAllData();
       if (onDataChange) onDataChange();
     } catch (e) {
@@ -183,9 +179,8 @@ export function AdminPortalModal({ onClose, onDataChange }) {
     e.preventDefault();
     if (!newAlert.message) return;
     try {
-      await fetch('/api/admin/alerts', {
+      await resilientFetch('/api/admin/alerts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAlert)
       });
       setShowAddAlert(false);
@@ -199,7 +194,7 @@ export function AdminPortalModal({ onClose, onDataChange }) {
 
   const dismissAlert = async (id) => {
     try {
-      await fetch(`/api/admin/alerts/${id}`, { method: 'DELETE' });
+      await resilientFetch(`/api/admin/alerts/${id}`, { method: 'DELETE' });
       fetchAllData();
       if (onDataChange) onDataChange();
     } catch (e) {

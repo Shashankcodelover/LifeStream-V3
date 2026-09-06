@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Hospital, PackageCheck, AlertTriangle, Phone, ShieldCheck } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
@@ -10,9 +11,8 @@ export function HospitalInventoryModal({ onClose }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/hospitals');
-        const data = await res.json();
-        setHospitals(data);
+        const data = await resilientFetch('/api/hospitals');
+        setHospitals(data || []);
       } catch (e) {}
       setLoading(false);
     })();

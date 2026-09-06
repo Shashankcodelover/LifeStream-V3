@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trophy, Award, Heart, Send, CheckCircle2, ShieldCheck, Zap, Phone } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 export function DonorLeaderboardModal({ onClose, activeHospitalName = 'SF General Trauma Center' }) {
   const [donors, setDonors] = useState([]);
@@ -10,9 +11,8 @@ export function DonorLeaderboardModal({ onClose, activeHospitalName = 'SF Genera
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/donors/leaderboard');
-        const data = await res.json();
-        setDonors(data);
+        const data = await resilientFetch('/api/donors/leaderboard');
+        setDonors(data || []);
       } catch (e) {
         console.error(e);
       } finally {
@@ -24,16 +24,14 @@ export function DonorLeaderboardModal({ onClose, activeHospitalName = 'SF Genera
   const handleSimulatePing = async (donor) => {
     setPingedDonorId(donor.id);
     try {
-      const res = await fetch(`/api/donors/ping/${donor.id}`, {
+      const data = await resilientFetch(`/api/donors/ping/${donor.id}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           hospitalName: activeHospitalName,
           bloodType: donor.bloodType,
           urgency: 'critical'
         })
       });
-      const data = await res.json();
       setPingMessage(data.notification);
     } catch (e) {
       console.error(e);
@@ -41,7 +39,7 @@ export function DonorLeaderboardModal({ onClose, activeHospitalName = 'SF Genera
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div
         className="w-full max-w-3xl glass-panel p-6 rounded-2xl shadow-2xl border border-slate-700/80 relative flex flex-col max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}

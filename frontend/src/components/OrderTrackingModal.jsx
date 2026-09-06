@@ -4,6 +4,7 @@ import {
   MapPin, AlertTriangle, ArrowRight, ExternalLink, QrCode, FileText,
   Navigation
 } from 'lucide-react';
+import { resilientFetch } from '../api/client';
 
 export function OrderTrackingModal({ onClose, activeDispatches = [] }) {
   const [requests, setRequests] = useState([]);
@@ -13,10 +14,9 @@ export function OrderTrackingModal({ onClose, activeDispatches = [] }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/requests');
-        const data = await res.json();
-        setRequests(data);
-        if (data.length > 0 && !selectedRequestId) {
+        const data = await resilientFetch('/api/requests');
+        setRequests(data || []);
+        if (data && data.length > 0 && !selectedRequestId) {
           setSelectedRequestId(data[0].id);
         }
       } catch (e) {

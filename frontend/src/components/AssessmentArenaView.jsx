@@ -82,9 +82,8 @@ export function AssessmentArenaView({ user }) {
     setProctorLogs(prev => [logMsg, ...prev]);
 
     try {
-      await fetch('/api/assessment/proctor-audit', {
+      await resilientFetch('/api/assessment/proctor-audit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventType: type,
           candidateName: user?.name || 'Trauma Director Candidate',
@@ -121,9 +120,8 @@ export function AssessmentArenaView({ user }) {
     setIsSubmitted(true);
     setShowProctorWarning(false);
     try {
-      const res = await fetch('/api/assessment/submit', {
+      const data = await resilientFetch('/api/assessment/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           candidateName: user?.name || 'Dr. Evelyn Vance, MD',
           candidateRole: 'Senior Trauma Logistics Coordinator',
@@ -132,7 +130,6 @@ export function AssessmentArenaView({ user }) {
           timeElapsedSeconds: 900 - secondsRemaining
         })
       });
-      const data = await res.json();
       setScorecard(data);
     } catch (e) {
       console.error(e);
