@@ -122,6 +122,18 @@ export function Navbar({
         </button>
 
         <button
+          onClick={() => setActiveTab('arena')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeTab === 'arena'
+              ? 'bg-white text-[#ea4335] shadow-sm font-bold'
+              : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
+          }`}
+        >
+          <ShieldAlert className="w-3.5 h-3.5 text-[#ea4335]" />
+          <span>Proctored Arena</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('community')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             activeTab === 'community'
