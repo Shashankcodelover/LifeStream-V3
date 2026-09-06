@@ -103,6 +103,16 @@ export function DeliveryTrackerView({ activeDispatches = [], onOpenEmergencyRequ
             <span>Simulate Step ({activeStep}/5)</span>
           </button>
 
+          {relatedDispatch && (
+            <button
+              onClick={() => onOpenCustodyModal && onOpenCustodyModal(relatedDispatch)}
+              className="flex items-center gap-1.5 bg-[#e6f4ea] hover:bg-[#ceead6] text-[#137333] border border-[#ceead6] text-xs font-bold px-3.5 py-2 rounded-full shadow-sm transition-all"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#34a853]" />
+              <span>Verify SHA-256 Custody Seal</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenEmergencyRequest}
             className="flex items-center gap-1.5 bg-[#ea4335] hover:bg-[#d93025] text-white text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all"

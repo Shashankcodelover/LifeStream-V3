@@ -59,6 +59,39 @@ router.get('/demo-accounts', (req, res) => {
   ]);
 });
 
+// GET /api/auth/donor-pass — Digital NFC Google Wallet Pass data
+router.get('/donor-pass', (req, res) => {
+  const db = readDB();
+  const donor = (db.donors || [])[0] || {
+    name: 'Marcus Vance',
+    bloodType: 'O-',
+    totalDonations: 15,
+    reliabilityScore: 98,
+    isVerified: true
+  };
+
+  const estimatedLivesSaved = (donor.totalDonations || 1) * 3;
+  const nextEligibleDate = new Date(Date.now() + 86400000 * 28).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric'
+  });
+
+  res.json({
+    passId: `PASS-NFC-${Date.now().toString().slice(-6)}`,
+    passHolderName: donor.name,
+    bloodType: donor.bloodType,
+    phenotype: 'RhD+ | Kell(K-) | C+ c+ E- e+',
+    donorTier: donor.totalDonations > 10 ? 'PLATINUM GUARDIAN' : 'GOLD LIFESAVER',
+    totalDonations: donor.totalDonations || 15,
+    estimatedLivesSaved,
+    reliabilityScore: donor.reliabilityScore || 98,
+    nextEligibleDate,
+    nfcTagId: `04:A2:88:1B:3E:90`,
+    barcode: `W982400192841`,
+    verifiedBy: 'American Red Cross & Google Health LifeStream Registry',
+    qrPayload: `LIFESTREAM:PASS:${donor.name}:${donor.bloodType}:VERIFIED`
+  });
+});
+
 // POST /api/auth/login — User login
 router.post('/login', (req, res) => {
   const { email, password } = req.body;

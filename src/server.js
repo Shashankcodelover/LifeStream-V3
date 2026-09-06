@@ -16,6 +16,8 @@ app.use('/api/dispatch', require('./routes/dispatch'));
 app.use('/api/hospitals', require('./routes/hospitals'));
 app.use('/api/requests', require('./routes/requests'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/clinical', require('./routes/clinical'));
+app.use('/api/drives', require('./routes/drives'));
 
 // Backward compatibility endpoints for legacy frontend compatibility
 app.get('/api/matches/:bloodType', (req, res) => {
@@ -28,7 +30,7 @@ app.get('/api/track/:dispatchId', (req, res) => {
 
 // 24/7 Keepalive & Health check endpoints
 app.get('/health', (req, res) => res.status(200).json({
-  status: 'LifeStream Enterprise V4.0 Online',
+  status: 'LifeStream Enterprise V5.0 Online',
   uptime: Math.round(process.uptime()),
   timestamp: new Date().toISOString()
 }));
@@ -49,11 +51,11 @@ app.get('*', (req, res) => {
   const indexPath = path.join(frontendDistPath, 'index.html');
   res.sendFile(indexPath, err => {
     if (err) {
-      res.status(200).send(`<h2>LifeStream Enterprise V4.0 API Online</h2><p>Visit <a href="http://localhost:5173">Vite Dev Server</a> for frontend.</p>`);
+      res.status(200).send(`<h2>LifeStream Enterprise V5.0 API Online</h2><p>Visit <a href="http://localhost:5173">Vite Dev Server</a> for frontend.</p>`);
     }
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 LifeStream Enterprise V4.0 Platform running 24/7 on port ${PORT}`);
+  console.log(`🚀 LifeStream Enterprise V5.0 Platform running 24/7 on port ${PORT}`);
 });

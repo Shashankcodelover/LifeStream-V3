@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Activity, Radio, Siren, Droplet, Trophy, Package,
   Compass, MapPin, Volume2, VolumeX, LogIn, User, Hospital, ShieldAlert,
-  ChevronDown, HeartPulse, Sparkles
+  ChevronDown, HeartPulse, Sparkles, TrendingUp, QrCode
 } from 'lucide-react';
 
 export function Navbar({
@@ -13,6 +13,7 @@ export function Navbar({
   onOpenProfile,
   onOpenEmergencyRequest,
   onOpenAdmin,
+  onOpenDonorPass,
   onToggleSound,
   soundOn = true,
   activeDispatchCount = 0,
@@ -44,22 +45,22 @@ export function Navbar({
                 <span className="font-medium text-[#5f6368]">Google</span> Health <span className="text-[#1a73e8]">LifeStream</span>
               </span>
               <span className="text-[10px] font-medium bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] px-2 py-0.5 rounded-full">
-                V4.0 Enterprise
+                V5.0 Enterprise
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-[11px] text-[#5f6368]">
               <span className="w-2 h-2 rounded-full bg-[#34a853] animate-pulse" />
-              <span>Real-Time Trauma Dispatch Network</span>
+              <span>Real-Time Autonomous Trauma Dispatch</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modular Material 3 Tabs */}
-      <nav className="hidden md:flex items-center gap-1 bg-[#f1f3f4] p-1 rounded-full border border-[#dadce0]">
+      {/* Modular 5-Tab Material 3 Navigation Switcher */}
+      <nav className="hidden lg:flex items-center gap-1 bg-[#f1f3f4] p-1 rounded-full border border-[#dadce0]">
         <button
           onClick={() => setActiveTab('radar')}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             activeTab === 'radar'
               ? 'bg-white text-[#1a73e8] shadow-sm font-bold'
               : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
@@ -71,7 +72,7 @@ export function Navbar({
 
         <button
           onClick={() => setActiveTab('tracker')}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all relative ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all relative ${
             activeTab === 'tracker'
               ? 'bg-white text-[#1a73e8] shadow-sm font-bold'
               : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
@@ -85,20 +86,32 @@ export function Navbar({
         </button>
 
         <button
-          onClick={() => setActiveTab('reserves')}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
-            activeTab === 'reserves'
+          onClick={() => setActiveTab('clinical')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeTab === 'clinical'
+              ? 'bg-white text-[#ea4335] shadow-sm font-bold'
+              : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
+          }`}
+        >
+          <HeartPulse className="w-3.5 h-3.5 text-[#ea4335]" />
+          <span>Clinical MTP</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('forecaster')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeTab === 'forecaster'
               ? 'bg-white text-[#1a73e8] shadow-sm font-bold'
               : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
           }`}
         >
-          <Hospital className="w-3.5 h-3.5 text-[#ea4335]" />
-          <span>Blood Reserves</span>
+          <TrendingUp className="w-3.5 h-3.5 text-[#1a73e8]" />
+          <span>AI Forecaster</span>
         </button>
 
         <button
           onClick={() => setActiveTab('community')}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             activeTab === 'community'
               ? 'bg-white text-[#1a73e8] shadow-sm font-bold'
               : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
@@ -111,6 +124,16 @@ export function Navbar({
 
       {/* Action Controls & Google Account */}
       <div className="flex items-center gap-2">
+        {/* Digital Wallet Pass Button */}
+        <button
+          onClick={onOpenDonorPass}
+          title="Open Google Wallet / Apple Wallet Digital Hero Pass"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#f8fafd] text-[#1a73e8] border border-[#dadce0] hover:bg-[#e8f0fe] transition-all"
+        >
+          <QrCode className="w-3.5 h-3.5 text-[#1a73e8]" />
+          <span>Wallet Pass</span>
+        </button>
+
         {/* Live GPS Locator Button */}
         <button
           onClick={onToggleUserLocation}
@@ -131,7 +154,7 @@ export function Navbar({
           className="flex items-center gap-1.5 bg-[#ea4335] hover:bg-[#d93025] text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm hover:shadow-md transition-all active:scale-95"
         >
           <Siren className="w-3.5 h-3.5 animate-pulse" />
-          <span>STAT Request</span>
+          <span>STAT SOS</span>
         </button>
 
         {/* Sound Toggle */}
@@ -147,7 +170,7 @@ export function Navbar({
         <button
           onClick={onOpenAdmin}
           title="Open Admin Command Suite"
-          className="p-2 rounded-full text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] transition-all hidden lg:flex"
+          className="p-2 rounded-full text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] transition-all hidden xl:flex"
         >
           <ShieldAlert className="w-4 h-4 text-[#fbbc04]" />
         </button>

@@ -3,7 +3,9 @@ import { Navbar } from './components/Navbar';
 import { RadarMap } from './components/RadarMap';
 import { DispatchSidebar } from './components/DispatchSidebar';
 import { TelemetryOverlay } from './components/TelemetryOverlay';
-import { ReservesView } from './components/ReservesView';
+import { DroneCockpitHUD } from './components/DroneCockpitHUD';
+import { ClinicalMTPView } from './components/ClinicalMTPView';
+import { PredictiveForecasterView } from './components/PredictiveForecasterView';
 import { CommunityView } from './components/CommunityView';
 import { DeliveryTrackerView } from './components/DeliveryTrackerView';
 import { AuthModal } from './components/AuthModal';
@@ -14,13 +16,15 @@ import { DonorAppointmentModal } from './components/DonorAppointmentModal';
 import { DonorEligibilityModal } from './components/DonorEligibilityModal';
 import { InterHospitalTransferModal } from './components/InterHospitalTransferModal';
 import { RegisterDonorModal } from './components/RegisterDonorModal';
+import { DigitalDonorPassModal } from './components/DigitalDonorPassModal';
+import { DigitalCustodyModal } from './components/DigitalCustodyModal';
 import { ToastNotification } from './components/ToastNotification';
 import { playDispatchSonar, playArrivalChime, toggleSound } from './utils/audioAlerts';
 import { resilientFetch } from './api/client';
 
 export default function App() {
-  // Navigation View Tab State
-  const [activeTab, setActiveTab] = useState('radar'); // radar | tracker | reserves | community
+  // Navigation View Tab State (5 Modular Views)
+  const [activeTab, setActiveTab] = useState('radar'); // radar | tracker | clinical | forecaster | community
 
   // Authentication State
   const [user, setUser] = useState(() => {
@@ -63,6 +67,9 @@ export default function App() {
   const [showEligibilityModal, setShowEligibilityModal] = useState(false);
   const [showInterHospital, setShowInterHospital] = useState(false);
   const [showRegisterDonor, setShowRegisterDonor] = useState(false);
+  const [showDonorPass, setShowDonorPass] = useState(false);
+  const [selectedCustodyDispatch, setSelectedCustodyDispatch] = useState(null);
+  const [showCockpitHUD, setShowCockpitHUD] = useState(true);
 
   const trackingIntervalRef = useRef(null);
   const acknowledgedArrivedRef = useRef(new Set());
@@ -85,7 +92,6 @@ export default function App() {
           },
           (err) => {
             console.warn(err);
-            // Default SF General coordinates fallback if browser permission blocked
             const coords = { lat: 37.7749, lng: -122.4194 };
             setUserLocation(coords);
             setIsTrackingLocation(true);
@@ -173,7 +179,7 @@ export default function App() {
   }, [pollActiveTelemetry]);
 
   // Initiate Dispatch Mission
-  const handleDispatch = async (donorId, transportType) => {
+  const handleDispatch = async (donorId, transportType, componentType) => {
     try {
       playDispatchSonar();
       const res = await fetch('/api/dispatch', {
@@ -182,6 +188,7 @@ export default function App() {
         body: JSON.stringify({
           donorId,
           transportType,
+          componentType,
           hospitalId: selectedHospitalId
         })
       });
@@ -189,9 +196,22 @@ export default function App() {
       setDispatches(prev => [newDisp, ...prev]);
       setFocusedDispatchId(newDisp.id);
       fetchMatches();
-      showToast(`🚀 ${newDisp.transportType} ${newDisp.id} launched for emergency payload.`, 'info');
+      showToast(`🚀 ${newDisp.transportType} ${newDisp.id} launched with SHA-256 seal.`, 'info');
     } catch (err) {
       console.error('Dispatch error:', err);
+    }
+  };
+
+  // Launch MTP Multi-Drone Fleet
+  const handleLaunchMTPBundle = async (prbcCount, ffpCount) => {
+    try {
+      playDispatchSonar();
+      const donor = matches[0] || { id: 101 };
+      await handleDispatch(donor.id, 'MTP Drone Fleet Vector 1', 'Packed Red Blood Cells (PRBC)');
+      showToast(`⚡ STAT MTP 1:1:1 Resuscitation Fleet dispatched (${prbcCount} PRBC + ${ffpCount} FFP).`, 'success');
+      setActiveTab('tracker');
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -234,6 +254,7 @@ export default function App() {
 
   const activeInFlightCount = dispatches.filter(d => d.status === 'En Route').length;
   const currentHospital = hospitals.find(h => h.id === selectedHospitalId) || hospitals[0] || { name: 'SF General Trauma Center', lat: 37.7749, lng: -122.4194 };
+  const currentFocusedDispatch = dispatches.find(d => d.id === focusedDispatchId) || dispatches.find(d => d.status === 'En Route') || dispatches[0];
 
   return (
     <div className="relative w-full h-screen overflow-x-hidden select-none bg-[#f8fafd] font-sans text-[#202124]">
@@ -249,6 +270,7 @@ export default function App() {
         onOpenProfile={() => setShowProfileModal(true)}
         onOpenEmergencyRequest={() => setShowEmergencyRequest(true)}
         onOpenAdmin={() => setShowAdminModal(true)}
+        onOpenDonorPass={() => setShowDonorPass(true)}
         onToggleSound={handleSoundToggle}
         soundOn={soundOn}
         activeDispatchCount={activeInFlightCount}
@@ -256,7 +278,7 @@ export default function App() {
         onToggleUserLocation={toggleUserLocation}
       />
 
-      {/* VIEW 1: RADAR & DISPATCH (Clean Full Map with Collapsible Controls) */}
+      {/* VIEW 1: RADAR & DISPATCH (Clean Full Map with Collapsible Controls & Drone Cockpit HUD) */}
       {activeTab === 'radar' && (
         <div className="relative w-full h-full">
           <RadarMap
@@ -282,7 +304,7 @@ export default function App() {
             onDispatch={handleDispatch}
             onOpenInterHospital={() => setShowInterHospital(true)}
             onOpenEmergencyRequest={() => setShowEmergencyRequest(true)}
-            onOpenMatrix={() => setActiveTab('reserves')}
+            onOpenMatrix={() => setActiveTab('clinical')}
           />
 
           <TelemetryOverlay
@@ -291,33 +313,53 @@ export default function App() {
             onFocusDispatch={setFocusedDispatchId}
             onConfirmReceipt={handleConfirmReceipt}
           />
+
+          {/* Real-Time Drone Flight Cockpit HUD */}
+          {showCockpitHUD && currentFocusedDispatch && currentFocusedDispatch.status === 'En Route' && (
+            <DroneCockpitHUD
+              dispatch={currentFocusedDispatch}
+              onClose={() => setShowCockpitHUD(false)}
+              onActionFeedback={(msg) => showToast(msg, 'info')}
+            />
+          )}
         </div>
       )}
 
-      {/* VIEW 2: DELIVERY TRACKER */}
+      {/* VIEW 2: DELIVERY TRACKER & CUSTODY */}
       {activeTab === 'tracker' && (
         <DeliveryTrackerView
           activeDispatches={dispatches}
           onOpenEmergencyRequest={() => setShowEmergencyRequest(true)}
+          onOpenCustodyModal={(disp) => setSelectedCustodyDispatch(disp)}
         />
       )}
 
-      {/* VIEW 3: BLOOD RESERVES & MATRIX */}
-      {activeTab === 'reserves' && (
-        <ReservesView
+      {/* VIEW 3: CLINICAL MTP RESUSCITATION & COMPONENT RESERVES */}
+      {activeTab === 'clinical' && (
+        <ClinicalMTPView
           hospitals={hospitals}
           onOpenInterHospital={() => setShowInterHospital(true)}
           onOpenEmergencyRequest={() => setShowEmergencyRequest(true)}
+          onLaunchMTPBundle={handleLaunchMTPBundle}
         />
       )}
 
-      {/* VIEW 4: HERO COMMUNITY & APPOINTMENTS */}
+      {/* VIEW 4: AI PREDICTIVE REGIONAL SHORTAGE FORECASTER */}
+      {activeTab === 'forecaster' && (
+        <PredictiveForecasterView
+          hospitals={hospitals}
+          onOpenInterHospital={() => setShowInterHospital(true)}
+        />
+      )}
+
+      {/* VIEW 5: HERO COMMUNITY & REGIONAL BLOOD DRIVES */}
       {activeTab === 'community' && (
         <CommunityView
           user={user}
           hospitals={hospitals}
           onOpenAppointments={() => setShowAppointments(true)}
           onOpenEligibility={() => setShowEligibilityModal(true)}
+          onOpenDonorPass={() => setShowDonorPass(true)}
         />
       )}
 
@@ -354,6 +396,22 @@ export default function App() {
             setActiveTab('tracker');
             showToast(`STAT Emergency Request ${ticket.request.id} broadcasted. Delivery tracker opened.`, 'info');
           }}
+        />
+      )}
+
+      {/* DIGITAL DONOR WALLET PASS MODAL */}
+      {showDonorPass && (
+        <DigitalDonorPassModal
+          user={user}
+          onClose={() => setShowDonorPass(false)}
+        />
+      )}
+
+      {/* DIGITAL PROOF-OF-CUSTODY AUDIT MODAL */}
+      {selectedCustodyDispatch && (
+        <DigitalCustodyModal
+          dispatch={selectedCustodyDispatch}
+          onClose={() => setSelectedCustodyDispatch(null)}
         />
       )}
 

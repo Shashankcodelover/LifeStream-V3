@@ -16,6 +16,8 @@ app.use('/api/dispatch', require('../src/routes/dispatch'));
 app.use('/api/hospitals', require('../src/routes/hospitals'));
 app.use('/api/requests', require('../src/routes/requests'));
 app.use('/api/admin', require('../src/routes/admin'));
+app.use('/api/clinical', require('../src/routes/clinical'));
+app.use('/api/drives', require('../src/routes/drives'));
 
 // Backward compatibility routes
 app.get('/api/matches/:bloodType', (req, res) => {
@@ -28,7 +30,7 @@ app.get('/api/track/:dispatchId', (req, res) => {
 
 // Health and Ping endpoints
 app.get('/health', (req, res) => res.status(200).json({
-  status: 'LifeStream V4.0 Vercel Serverless Online',
+  status: 'LifeStream V5.0 Vercel Serverless Online',
   uptime: Math.round(process.uptime()),
   timestamp: new Date().toISOString()
 }));
@@ -56,11 +58,11 @@ app.get('*', (req, res) => {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LifeStream V4.0 Enterprise</title>
+  <title>LifeStream V5.0 Enterprise</title>
   <meta http-equiv="refresh" content="0; url=/" />
 </head>
 <body style="background:#020617; color:#f8fafc; font-family:sans-serif; text-align:center; padding:40px;">
-  <h2>LifeStream V4.0 Serverless Initializing</h2>
+  <h2>LifeStream V5.0 Serverless Initializing</h2>
   <p>Connecting to emergency blood dispatch network...</p>
 </body>
 </html>`);
