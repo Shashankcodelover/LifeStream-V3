@@ -20,6 +20,7 @@ app.use('/api/clinical', require('./routes/clinical'));
 app.use('/api/drives', require('./routes/drives'));
 app.use('/api/algorithm', require('./routes/algorithm'));
 app.use('/api/assessment', require('./routes/assessment'));
+app.use('/api/architecture', require('./routes/architecture'));
 
 // Backward compatibility endpoints for legacy frontend compatibility
 app.get('/api/matches/:bloodType', (req, res) => {
