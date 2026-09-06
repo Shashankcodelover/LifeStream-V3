@@ -11,6 +11,7 @@ import { DeliveryTrackerView } from './components/DeliveryTrackerView';
 import { AlgorithmStudioView } from './components/AlgorithmStudioView';
 import { AssessmentArenaView } from './components/AssessmentArenaView';
 import { ArchitectureSandboxView } from './components/ArchitectureSandboxView';
+import { RecruiterPortalView } from './components/RecruiterPortalView';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { AdminPortalModal } from './components/AdminPortalModal';
@@ -368,6 +369,11 @@ export default function App() {
       {/* VIEW 7: DISTRIBUTED ARCHITECTURE & SYSTEM DESIGN SANDBOX */}
       {activeTab === 'architecture' && (
         <ArchitectureSandboxView />
+      )}
+
+      {/* VIEW 8: STARTUP B2B ENTERPRISE & RECRUITER CLEARINGHOUSE */}
+      {activeTab === 'recruiter' && (
+        <RecruiterPortalView />
       )}
 
       {/* VIEW 6: HERO COMMUNITY & REGIONAL BLOOD DRIVES */}
