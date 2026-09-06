@@ -22,6 +22,7 @@ import { InterHospitalTransferModal } from './components/InterHospitalTransferMo
 import { RegisterDonorModal } from './components/RegisterDonorModal';
 import { DigitalDonorPassModal } from './components/DigitalDonorPassModal';
 import { DigitalCustodyModal } from './components/DigitalCustodyModal';
+import { AICopilotModal } from './components/AICopilotModal';
 import { ToastNotification } from './components/ToastNotification';
 import { playDispatchSonar, playArrivalChime, toggleSound } from './utils/audioAlerts';
 import { resilientFetch } from './api/client';
@@ -74,6 +75,19 @@ export default function App() {
   const [showDonorPass, setShowDonorPass] = useState(false);
   const [selectedCustodyDispatch, setSelectedCustodyDispatch] = useState(null);
   const [showCockpitHUD, setShowCockpitHUD] = useState(true);
+  const [showCopilot, setShowCopilot] = useState(false);
+
+  // Global Keyboard Shortcut: Ctrl+K / Cmd+K to open AI Copilot
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowCopilot(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const trackingIntervalRef = useRef(null);
   const acknowledgedArrivedRef = useRef(new Set());
@@ -280,6 +294,7 @@ export default function App() {
         activeDispatchCount={activeInFlightCount}
         isTrackingUserLocation={isTrackingLocation}
         onToggleUserLocation={toggleUserLocation}
+        onOpenCopilot={() => setShowCopilot(true)}
       />
 
       {/* VIEW 1: RADAR & DISPATCH (Clean Full Map with Collapsible Controls & Drone Cockpit HUD) */}
@@ -438,6 +453,12 @@ export default function App() {
           onClose={() => setSelectedCustodyDispatch(null)}
         />
       )}
+
+      {/* AI COPILOT & CLINICAL MENTOR MODAL */}
+      <AICopilotModal
+        isOpen={showCopilot}
+        onClose={() => setShowCopilot(false)}
+      />
 
       {/* APPOINTMENT MODAL */}
       {showAppointments && (

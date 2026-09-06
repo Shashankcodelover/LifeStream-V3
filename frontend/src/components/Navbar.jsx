@@ -18,7 +18,8 @@ export function Navbar({
   soundOn = true,
   activeDispatchCount = 0,
   isTrackingUserLocation = false,
-  onToggleUserLocation
+  onToggleUserLocation,
+  onOpenCopilot
 }) {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-6 h-16 flex items-center justify-between bg-white/95 backdrop-blur-md border-b border-[#dadce0] shadow-[0_1px_3px_rgba(60,64,67,0.08)]">
@@ -172,6 +173,16 @@ export function Navbar({
 
       {/* Action Controls & Google Account */}
       <div className="flex items-center gap-2">
+        {/* AI Copilot & Mentor Button */}
+        <button
+          onClick={onOpenCopilot}
+          title="Open LifeStream AI Copilot & Clinical Mentor (Ctrl+K)"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] hover:bg-[#d2e3fc] transition-all shadow-xs"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#1a73e8]" />
+          <span>AI Copilot</span>
+        </button>
+
         {/* Digital Wallet Pass Button */}
         <button
           onClick={onOpenDonorPass}
