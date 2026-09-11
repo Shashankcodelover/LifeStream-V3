@@ -159,6 +159,18 @@ export function Navbar({
         </button>
 
         <button
+          onClick={() => setActiveTab('trauma-network')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeTab === 'trauma-network'
+              ? 'bg-white text-[#ea4335] shadow-sm font-bold'
+              : 'text-[#5f6368] hover:text-[#202124] hover:bg-white/60'
+          }`}
+        >
+          <Compass className="w-3.5 h-3.5 text-[#ea4335]" />
+          <span>Trauma & Airspace</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('community')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             activeTab === 'community'

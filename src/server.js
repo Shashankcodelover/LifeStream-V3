@@ -23,6 +23,7 @@ app.use('/api/assessment', require('./routes/assessment'));
 app.use('/api/architecture', require('./routes/architecture'));
 app.use('/api/recruiter', require('./routes/recruiter'));
 app.use('/api/copilot', require('./routes/copilot'));
+app.use('/api/trauma-network', require('./routes/traumaDroneNetwork'));
 
 // Backward compatibility endpoints for legacy frontend compatibility
 app.get('/api/matches/:bloodType', (req, res) => {

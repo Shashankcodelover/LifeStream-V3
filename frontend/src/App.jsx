@@ -12,6 +12,7 @@ import { AlgorithmStudioView } from './components/AlgorithmStudioView';
 import { AssessmentArenaView } from './components/AssessmentArenaView';
 import { ArchitectureSandboxView } from './components/ArchitectureSandboxView';
 import { RecruiterPortalView } from './components/RecruiterPortalView';
+import { TraumaDroneMissionControlView } from './components/TraumaDroneMissionControlView';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { AdminPortalModal } from './components/AdminPortalModal';
@@ -386,6 +387,11 @@ export default function App() {
       {/* VIEW 8: STARTUP B2B ENTERPRISE & RECRUITER CLEARINGHOUSE */}
       {activeTab === 'recruiter' && (
         <RecruiterPortalView />
+      )}
+
+      {/* VIEW 9: AUTONOMOUS TRAUMA TRIAGE, DRONE AIRSPACE & INTER-HOSPITAL SWAPS */}
+      {activeTab === 'trauma-network' && (
+        <TraumaDroneMissionControlView />
       )}
 
       {/* VIEW 6: HERO COMMUNITY & REGIONAL BLOOD DRIVES */}
