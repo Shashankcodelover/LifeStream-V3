@@ -6,6 +6,26 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const {
+  calculateAirspaceReroute,
+  generateATCClearance,
+  generateCustodyPassport
+} = require('../services/airspaceEngine');
+
+// Active Dynamic Airspace Obstacles (Microbursts, TFRs, Heliport holds)
+let ACTIVE_AIRSPACE_OBSTACLES = [
+  {
+    id: 'OBS-WIND-01',
+    type: 'HIGH_WIND_MICROBURST',
+    name: 'Bernal Heights Wind Shear Cell',
+    center: { lat: 37.7420, lng: -122.4150 },
+    radiusMeters: 1400,
+    windSpeedKnots: 38,
+    severity: 'HAZARDOUS_TURBULENCE',
+    description: 'Sudden 38 kt downdraft exceeding Part 135 rotorcraft limits',
+    timestamp: new Date().toISOString()
+  }
+];
 
 // Regional Level 1 & Level 2 Trauma Centers
 const TRAUMA_CENTERS = [
@@ -353,6 +373,7 @@ router.get('/drone-airspace', (req, res) => {
       fleetCount: ACTIVE_DRONE_FLEET.length,
       activeDrones: ACTIVE_DRONE_FLEET,
       noFlyZones: NO_FLY_ZONES,
+      obstacles: ACTIVE_AIRSPACE_OBSTACLES,
       telemetryStatus: 'ALL_FLIGHTS_NOMINAL'
     });
   } catch (err) {
@@ -455,6 +476,166 @@ router.post('/execute-swap', (req, res) => {
       success: true,
       swap: newSwap,
       message: 'Autonomous Inter-Hospital Rebalancing Swap executed. Drone courier scheduled.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/trauma-network/inject-obstacle
+ * Injects dynamic weather anomaly or Temporary Flight Restriction (TFR)
+ */
+router.post('/inject-obstacle', (req, res) => {
+  try {
+    const {
+      type = 'HIGH_WIND_MICROBURST',
+      name = 'Dynamic Airspace Hazard',
+      center = { lat: 37.7600, lng: -122.4280 },
+      radiusMeters = 1200,
+      windSpeedKnots = 42,
+      severity = 'CRITICAL_GEOFENCE_BREACH',
+      description = 'Severe weather cell detected along primary medical corridor'
+    } = req.body;
+
+    const newObstacle = {
+      id: `OBS-${Date.now().toString(36).toUpperCase()}`,
+      type,
+      name,
+      center,
+      radiusMeters,
+      windSpeedKnots,
+      severity,
+      description,
+      timestamp: new Date().toISOString()
+    };
+
+    ACTIVE_AIRSPACE_OBSTACLES.push(newObstacle);
+
+    res.json({
+      success: true,
+      obstacle: newObstacle,
+      activeObstaclesCount: ACTIVE_AIRSPACE_OBSTACLES.length,
+      message: `Obstacle ${newObstacle.name} registered. Autonomous avoidance geofence active.`
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/trauma-network/clear-obstacles
+ * Clears all injected obstacles and restores nominal corridors
+ */
+router.post('/clear-obstacles', (req, res) => {
+  try {
+    ACTIVE_AIRSPACE_OBSTACLES = [];
+    res.json({
+      success: true,
+      message: 'All dynamic obstacles cleared. All direct airway corridors nominal.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/trauma-network/calculate-reroute
+ * Calculates polygon waypoint bypass for active drones encountering obstacles
+ */
+router.post('/calculate-reroute', (req, res) => {
+  try {
+    const {
+      origin = { lat: 37.7650, lng: -122.4180 },
+      destination = { lat: 37.7558, lng: -122.4047 },
+      droneCallsign = 'LifeStream Lifter-01',
+      cruisingSpeedKmh = 110
+    } = req.body;
+
+    const reroutePlan = calculateAirspaceReroute(
+      origin,
+      destination,
+      ACTIVE_AIRSPACE_OBSTACLES,
+      cruisingSpeedKmh
+    );
+
+    const atcClearance = generateATCClearance(
+      droneCallsign,
+      { name: 'Launch Station Bay-1' },
+      { name: 'Destination Heliport' },
+      reroutePlan
+    );
+
+    res.json({
+      success: true,
+      droneCallsign,
+      reroutePlan,
+      atcClearance,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/trauma-network/atc-clearances
+ * Returns real-time FAA-formatted ATC flight clearance scripts for active air corridors
+ */
+router.get('/atc-clearances', (req, res) => {
+  try {
+    const clearances = ACTIVE_DRONE_FLEET.map(drone => {
+      const reroutePlan = calculateAirspaceReroute(
+        drone.currentLocation,
+        drone.destinationCoords,
+        ACTIVE_AIRSPACE_OBSTACLES,
+        drone.speedKmh
+      );
+
+      return {
+        droneId: drone.id,
+        callsign: drone.callsign,
+        payloadSummary: `${drone.payload.units}x ${drone.payload.component} (${drone.payload.bloodType})`,
+        clearance: generateATCClearance(
+          drone.callsign,
+          { name: 'San Francisco General Heliport' },
+          { name: drone.destination },
+          reroutePlan
+        ),
+        rerouteRequired: reroutePlan.rerouted,
+        revisedEtaMin: reroutePlan.revisedEtaMin
+      };
+    });
+
+    res.json({
+      success: true,
+      clearances,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/trauma-network/custody-passport/:droneId
+ * Returns verifiable SHA-256 batch cryptographic proof passport
+ */
+router.get('/custody-passport/:droneId', (req, res) => {
+  try {
+    const { droneId } = req.params;
+    const drone = ACTIVE_DRONE_FLEET.find(d => d.id === droneId) || ACTIVE_DRONE_FLEET[0];
+
+    const passport = generateCustodyPassport(
+      drone.id,
+      drone.payload,
+      drone.coldChain.temperatureCelsius,
+      drone.payload.sealHash
+    );
+
+    res.json({
+      success: true,
+      passport
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

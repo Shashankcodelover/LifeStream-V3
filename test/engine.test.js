@@ -77,3 +77,85 @@ test('Cold-Chain IoT Thermal Regulation Simulation', () => {
   assert.ok(updated.altitudeMeters >= 120 && updated.altitudeMeters <= 185, 'Drone altitude in FAA corridor');
   assert.ok(updated.batteryPct <= 95, 'Battery should consume energy during flight');
 });
+
+const {
+  haversineDistanceKm,
+  distancePointToSegmentKm,
+  calculateAirspaceReroute,
+  generateATCClearance,
+  generateCustodyPassport
+} = require('../src/services/airspaceEngine');
+
+test('Autonomous Airspace Dynamic Obstacle Detection & Waypoint Bypass Engine', () => {
+  const origin = { lat: 37.7650, lng: -122.4180 };
+  const destination = { lat: 37.7558, lng: -122.4047 };
+
+  // 1. Direct route with no obstacles
+  const nominalRoute = calculateAirspaceReroute(origin, destination, []);
+  assert.equal(nominalRoute.rerouted, false);
+  assert.equal(nominalRoute.intersectingObstaclesCount, 0);
+  assert.equal(nominalRoute.waypoints.length, 2);
+  assert.ok(nominalRoute.directDistKm > 1.0 && nominalRoute.directDistKm < 2.5);
+
+  // 2. Obstacle placed directly in corridor
+  const obstacleInPath = {
+    id: 'OBS-TEST-1',
+    type: 'HIGH_WIND_MICROBURST',
+    center: { lat: 37.7604, lng: -122.4113 }, // directly between origin and dest
+    radiusMeters: 600,
+    description: 'Test Microburst Hazard'
+  };
+
+  const rerouted = calculateAirspaceReroute(origin, destination, [obstacleInPath]);
+  assert.equal(rerouted.rerouted, true);
+  assert.equal(rerouted.intersectingObstaclesCount, 1);
+  assert.ok(rerouted.waypoints.length >= 3, 'Must inject bypass waypoint');
+  assert.ok(rerouted.totalPathDistKm >= rerouted.directDistKm, 'Bypass path distance >= direct distance');
+  assert.ok(rerouted.revisedEtaMin >= rerouted.directEtaMin, 'Revised ETA reflects detour');
+  assert.ok(rerouted.isColdChainSafe, 'Cold chain must remain within 2.0°C - 6.0°C limits during detour');
+  assert.ok(rerouted.peltierCoolingWatts >= 38.0, 'Peltier active cooling power should compensate for detour');
+});
+
+test('FAA Part 135 ATC Clearances & Aviation Radio Synthesis Engine', () => {
+  const mockDrone = 'LifeStream Lifter-01';
+  const dest = { name: 'SF General Trauma Heliport' };
+
+  // Nominal clearance
+  const nominalClearance = generateATCClearance(mockDrone, null, dest, { rerouted: false });
+  assert.equal(nominalClearance.callsign, mockDrone);
+  assert.ok(nominalClearance.squawk.length === 4, 'Squawk code must be 4 digits');
+  assert.equal(nominalClearance.altitudeAssignmentMeters, 120);
+  assert.ok(nominalClearance.radioClearanceText.includes('Bay Approach'));
+  assert.equal(nominalClearance.faaPart135Compliant, true);
+
+  // Rerouted clearance with bypass directive
+  const mockReroutePlan = {
+    rerouted: true,
+    waypoints: [
+      { name: 'ORIGIN', isBypass: false },
+      { name: 'WP-WEATHER-BYPASS-1', isBypass: true },
+      { name: 'DEST', isBypass: false }
+    ]
+  };
+  const bypassClearance = generateATCClearance(mockDrone, null, dest, mockReroutePlan);
+  assert.equal(bypassClearance.altitudeAssignmentMeters, 150);
+  assert.ok(bypassClearance.radioClearanceText.includes('WP-WEATHER-BYPASS-1'));
+  assert.ok(bypassClearance.flightDirectives.some(d => d.includes('WP-WEATHER-BYPASS-1')));
+});
+
+test('Cryptographic SHA-256 Cold-Chain Chain of Custody (CoC) Passport Engine', () => {
+  const payload = {
+    bloodType: 'O-',
+    component: 'Packed Red Blood Cells (PRBC)',
+    units: 4
+  };
+
+  const passport = generateCustodyPassport('DRONE-V5-ALPHA', payload, 3.8);
+  assert.ok(passport.passportId.startsWith('COC-PASS-'));
+  assert.ok(passport.batchHash.startsWith('0x'));
+  assert.equal(passport.batchHash.length, 66); // 0x + 64 hex characters
+  assert.equal(passport.phlebotomySealVerified, true);
+  assert.equal(passport.thermalBoundaryLog.status, 'CERTIFIED_WITHIN_LIMITS');
+  assert.ok(passport.digitalSignature.startsWith('SHA256:ECDSA:'));
+});
+

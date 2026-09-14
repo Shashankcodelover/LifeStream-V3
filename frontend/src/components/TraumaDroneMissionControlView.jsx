@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Radio, ShieldAlert, HeartPulse, Droplet, ArrowRight, CheckCircle2,
   AlertTriangle, Compass, Wind, Thermometer, BatteryCharging, RefreshCw,
-  Send, ExternalLink, Zap, Lock, Cpu
+  Send, ExternalLink, Zap, Lock, Cpu, Volume2, VolumeX, FileCheck, Award,
+  Navigation, Flame, Eye, X, Play, Square, ShieldCheck
 } from 'lucide-react';
+import { playATCClearance, stopATCAudio, playRadioMicClick, playRadioSquelchBurst } from '../utils/atcAudio';
 
 export function TraumaDroneMissionControlView() {
   // State: Triage Inputs & Results
@@ -15,8 +17,21 @@ export function TraumaDroneMissionControlView() {
   const [triageData, setTriageData] = useState(null);
   const [triageLoading, setTriageLoading] = useState(false);
 
-  // State: Airspace Telemetry
+  // State: Airspace Telemetry & Dynamic Obstacles
   const [airspaceData, setAirspaceData] = useState(null);
+  const [obstacles, setObstacles] = useState([]);
+  const [reroutePlan, setReroutePlan] = useState(null);
+  const [anomalyLoading, setAnomalyLoading] = useState(false);
+
+  // State: FAA Radio ATC Communications
+  const [atcClearances, setAtcClearances] = useState([]);
+  const [activeATCIndex, setActiveATCIndex] = useState(0);
+  const [isBroadcastingATC, setIsBroadcastingATC] = useState(false);
+
+  // State: Cryptographic Custody Passport Modal
+  const [custodyModalOpen, setCustodyModalOpen] = useState(false);
+  const [custodyPassport, setCustodyPassport] = useState(null);
+  const [custodyLoading, setCustodyLoading] = useState(false);
 
   // State: Cross-Match Lab
   const [donorType, setDonorType] = useState('O-');
@@ -61,16 +76,32 @@ export function TraumaDroneMissionControlView() {
     }
   };
 
-  // Fetch Airspace Telemetry
+  // Fetch Airspace Telemetry & Active Obstacles
   const fetchAirspace = async () => {
     try {
       const res = await fetch('/api/trauma-network/drone-airspace');
       const data = await res.json();
       if (data.success) {
         setAirspaceData(data);
+        if (data.obstacles) {
+          setObstacles(data.obstacles);
+        }
       }
     } catch (err) {
       console.error('Airspace fetch failed:', err);
+    }
+  };
+
+  // Fetch ATC Clearances
+  const fetchATCClearances = async () => {
+    try {
+      const res = await fetch('/api/trauma-network/atc-clearances');
+      const data = await res.json();
+      if (data.success && data.clearances) {
+        setAtcClearances(data.clearances);
+      }
+    } catch (err) {
+      console.error('ATC clearances fetch failed:', err);
     }
   };
 
@@ -111,6 +142,115 @@ export function TraumaDroneMissionControlView() {
     }
   };
 
+  // Calculate Dynamic Airspace Reroute
+  const recalculateReroute = async () => {
+    try {
+      const res = await fetch('/api/trauma-network/calculate-reroute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: { lat: 37.7650, lng: -122.4180 },
+          destination: { lat: 37.7558, lng: -122.4047 },
+          droneCallsign: 'LifeStream Lifter-01'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReroutePlan(data.reroutePlan);
+      }
+    } catch (err) {
+      console.error('Reroute calculation failed:', err);
+    }
+  };
+
+  // Inject High-Wind Anomaly or TFR
+  const handleInjectObstacle = async (type, name, windSpeed, radius, desc) => {
+    setAnomalyLoading(true);
+    try {
+      const res = await fetch('/api/trauma-network/inject-obstacle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          name,
+          center: { lat: 37.7600, lng: -122.4120 },
+          radiusMeters: radius,
+          windSpeedKnots: windSpeed,
+          severity: 'CRITICAL_GEOFENCE_BREACH',
+          description: desc
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchAirspace();
+        await recalculateReroute();
+        await fetchATCClearances();
+        setDispatchFeedback(`⚠️ Airspace Anomaly Injected: ${name}. Dynamic polygon bypass corridor computed.`);
+        setTimeout(() => setDispatchFeedback(null), 6000);
+      }
+    } catch (err) {
+      console.error('Obstacle injection failed:', err);
+    } finally {
+      setAnomalyLoading(false);
+    }
+  };
+
+  // Clear Dynamic Obstacles
+  const handleClearObstacles = async () => {
+    setAnomalyLoading(true);
+    try {
+      const res = await fetch('/api/trauma-network/clear-obstacles', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        await fetchAirspace();
+        setReroutePlan(null);
+        await fetchATCClearances();
+        setDispatchFeedback('All dynamic weather and TFR obstacles cleared. Direct medical corridors restored.');
+        setTimeout(() => setDispatchFeedback(null), 5000);
+      }
+    } catch (err) {
+      console.error('Clear obstacles failed:', err);
+    } finally {
+      setAnomalyLoading(false);
+    }
+  };
+
+  // Play Synthesized Radio ATC Voice Clearance
+  const handlePlayActiveATC = () => {
+    const active = atcClearances[activeATCIndex] || atcClearances[0];
+    const script = active?.clearance?.radioClearanceText ||
+      'LifeStream Lifter-01, Bay Approach Radar Control. Wind 270 at 14 knots. Cleared corridor Alpha direct.';
+
+    if (isBroadcastingATC) {
+      stopATCAudio();
+      setIsBroadcastingATC(false);
+      return;
+    }
+
+    playATCClearance(
+      script,
+      () => setIsBroadcastingATC(true),
+      () => setIsBroadcastingATC(false)
+    );
+  };
+
+  // Inspect Cryptographic Custody Passport
+  const handleInspectCustody = async (droneId) => {
+    setCustodyLoading(true);
+    setCustodyModalOpen(true);
+    try {
+      const res = await fetch(`/api/trauma-network/custody-passport/${droneId}`);
+      const data = await res.json();
+      if (data.success) {
+        setCustodyPassport(data.passport);
+      }
+    } catch (err) {
+      console.error('Failed to load custody passport:', err);
+    } finally {
+      setCustodyLoading(false);
+    }
+  };
+
   // Execute Inter-Hospital Swap
   const handleExecuteSwap = async (e) => {
     e.preventDefault();
@@ -143,16 +283,19 @@ export function TraumaDroneMissionControlView() {
   useEffect(() => {
     evaluateTriage();
     fetchAirspace();
+    fetchATCClearances();
+    recalculateReroute();
     fetchSwaps();
     testCrossMatch();
 
     const interval = setInterval(() => {
       fetchAirspace();
-    }, 4000);
+      fetchATCClearances();
+    }, 4500);
     return () => clearInterval(interval);
   }, []);
 
-  // Airspace Canvas Simulation
+  // Airspace Canvas Simulation with Dynamic Obstacles & Curved Bypass
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -172,43 +315,54 @@ export function TraumaDroneMissionControlView() {
       // Grid Lines
       ctx.strokeStyle = 'rgba(66, 133, 244, 0.12)';
       ctx.lineWidth = 1;
-      for (let x = 0; x < w; x += 40) {
+      for (let x = 0; x < w; x += 35) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, h);
         ctx.stroke();
       }
-      for (let y = 0; y < h; y += 40) {
+      for (let y = 0; y < h; y += 35) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(w, y);
         ctx.stroke();
       }
 
-      // Rotating Radar Sweep
+      // Range Concentric Distance Rings
+      const cx = w / 2;
+      const cy = h / 2;
+      [80, 150, 220, 290].forEach(r => {
+        ctx.strokeStyle = 'rgba(66, 133, 244, 0.08)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Rotating Radar Sweep Line
       ctx.save();
-      ctx.translate(w / 2, h / 2);
+      ctx.translate(cx, cy);
       ctx.rotate(t * 0.02);
       const sweepGrad = ctx.createLinearGradient(0, 0, w / 2, h / 2);
-      sweepGrad.addColorStop(0, 'rgba(52, 168, 83, 0.25)');
+      sweepGrad.addColorStop(0, 'rgba(52, 168, 83, 0.28)');
       sweepGrad.addColorStop(1, 'transparent');
       ctx.fillStyle = sweepGrad;
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.arc(0, 0, Math.min(w, h) * 0.48, 0, Math.PI / 4);
+      ctx.arc(0, 0, Math.min(w, h) * 0.55, 0, Math.PI / 4);
       ctx.closePath();
       ctx.fill();
       ctx.restore();
 
-      // No Fly Zones (NFZ Rings)
+      // Static No Fly Zones (NFZ Rings)
       const nfzList = [
-        { x: w * 0.78, y: h * 0.72, r: 42, label: 'SFO Class B' },
-        { x: w * 0.35, y: h * 0.55, r: 26, label: 'Sutro Tower' },
-        { x: w * 0.65, y: h * 0.25, r: 24, label: 'Salesforce Mast' }
+        { x: w * 0.82, y: h * 0.74, r: 42, label: 'SFO Class B Airspace' },
+        { x: w * 0.28, y: h * 0.60, r: 24, label: 'Sutro Mast' },
+        { x: w * 0.72, y: h * 0.22, r: 22, label: 'Salesforce Mast' }
       ];
 
       nfzList.forEach(nfz => {
-        ctx.strokeStyle = 'rgba(234, 67, 53, 0.6)';
+        ctx.strokeStyle = 'rgba(234, 67, 53, 0.5)';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 4]);
         ctx.beginPath();
@@ -216,68 +370,154 @@ export function TraumaDroneMissionControlView() {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        ctx.fillStyle = 'rgba(234, 67, 53, 0.15)';
+        ctx.fillStyle = 'rgba(234, 67, 53, 0.12)';
         ctx.fill();
 
-        ctx.fillStyle = '#ea4335';
-        ctx.font = '10px monospace';
-        ctx.fillText(nfz.label, nfz.x - 22, nfz.y + 4);
+        ctx.fillStyle = '#f87171';
+        ctx.font = '9px monospace';
+        ctx.fillText(nfz.label, nfz.x - 28, nfz.y + 3);
       });
 
+      // Dynamic Obstacles (e.g. Injected Wind Shears / TFRs)
+      const hasActiveObstacles = obstacles && obstacles.length > 0;
+      const obsX = w * 0.45;
+      const obsY = h * 0.49;
+      const obsRadius = 45;
+
+      if (hasActiveObstacles) {
+        // Pulsing Anomaly Geofence Warning Ring
+        const pulseR = obsRadius + (Math.sin(t * 0.08) + 1) * 6;
+        ctx.strokeStyle = 'rgba(251, 146, 60, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 3]);
+        ctx.beginPath();
+        ctx.arc(obsX, obsY, pulseR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Translucent storm cell fill
+        const obsGrad = ctx.createRadialGradient(obsX, obsY, 5, obsX, obsY, obsRadius);
+        obsGrad.addColorStop(0, 'rgba(239, 68, 68, 0.45)');
+        obsGrad.addColorStop(1, 'rgba(249, 115, 22, 0.15)');
+        ctx.fillStyle = obsGrad;
+        ctx.beginPath();
+        ctx.arc(obsX, obsY, obsRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 10px monospace';
+        ctx.fillText('⚠ ANOMALY: WIND >42 KT', obsX - 55, obsY - 10);
+        ctx.fillStyle = '#fdba74';
+        ctx.font = '9px monospace';
+        ctx.fillText('GEOFENCE ACTIVE · PART 135 BYPASS', obsX - 68, obsY + 8);
+      }
+
       // Trauma Centers
-      const centers = [
-        { x: w * 0.52, y: h * 0.58, label: 'SFGH Trauma 1', beds: '8 ICU' },
-        { x: w * 0.38, y: h * 0.42, label: 'UCSF Parnassus', beds: '12 ICU' },
-        { x: w * 0.55, y: h * 0.28, label: 'CPMC Van Ness', beds: '5 ICU' }
-      ];
+      const ucsf = { x: w * 0.36, y: h * 0.38, label: 'UCSF Parnassus', beds: '12 ICU' };
+      const sfgh = { x: w * 0.54, y: h * 0.62, label: 'SFGH Trauma 1', beds: '8 ICU' };
+      const centers = [sfgh, ucsf, { x: w * 0.58, y: h * 0.26, label: 'CPMC Van Ness', beds: '5 ICU' }];
 
       centers.forEach(c => {
-        ctx.fillStyle = '#4285f4';
+        ctx.fillStyle = '#3b82f6';
         ctx.beginPath();
         ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.fillText(c.label, c.x + 10, c.y - 2);
-        ctx.fillStyle = '#34a853';
-        ctx.font = '10px monospace';
-        ctx.fillText(c.beds, c.x + 10, c.y + 11);
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText(c.label, c.x + 9, c.y - 2);
+        ctx.fillStyle = '#34d399';
+        ctx.font = '9px monospace';
+        ctx.fillText(c.beds, c.x + 9, c.y + 9);
       });
 
-      // In-flight Drones & Corridors
-      const droneA_x = (w * 0.38) + (Math.sin(t * 0.03) * 60) + 40;
-      const droneA_y = (h * 0.42) + (Math.cos(t * 0.03) * 40) + 30;
+      // Waypoint & Trajectory Visualization
+      const bypassWp = { x: w * 0.36, y: h * 0.56, label: 'WP-BRAVO-BYPASS' };
 
-      // Flight Vector Trajectory Line
-      ctx.strokeStyle = 'rgba(52, 168, 83, 0.4)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(w * 0.38, h * 0.42);
-      ctx.lineTo(w * 0.52, h * 0.58);
-      ctx.stroke();
+      if (hasActiveObstacles) {
+        // Direct flight path (Red Blocked Corridor)
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(ucsf.x, ucsf.y);
+        ctx.lineTo(sfgh.x, sfgh.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
 
-      // Drone Beacon
-      ctx.fillStyle = '#34a853';
+        // AI Optimized Safe Reroute Corridor (Glowing Cyan/Emerald Line through Bypass Waypoint)
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.85)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(ucsf.x, ucsf.y);
+        ctx.lineTo(bypassWp.x, bypassWp.y);
+        ctx.lineTo(sfgh.x, sfgh.y);
+        ctx.stroke();
+
+        // Bypass Waypoint Marker
+        ctx.fillStyle = '#34d399';
+        ctx.beginPath();
+        ctx.arc(bypassWp.x, bypassWp.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#a7f3d0';
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText('◈ WP-BYPASS-01', bypassWp.x - 25, bypassWp.y - 8);
+      } else {
+        // Direct Safe Flight Corridor (Emerald)
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ucsf.x, ucsf.y);
+        ctx.lineTo(sfgh.x, sfgh.y);
+        ctx.stroke();
+      }
+
+      // Animated Drone Courier Beacon along Active Corridor
+      let droneX, droneY;
+      const cycle = (t * 0.008) % 1; // 0 to 1 loop
+
+      if (hasActiveObstacles) {
+        // Traverse Segment 1 (UCSF to Bypass), then Segment 2 (Bypass to SFGH)
+        if (cycle < 0.5) {
+          const seg1 = cycle * 2;
+          droneX = ucsf.x + (bypassWp.x - ucsf.x) * seg1;
+          droneY = ucsf.y + (bypassWp.y - ucsf.y) * seg1;
+        } else {
+          const seg2 = (cycle - 0.5) * 2;
+          droneX = bypassWp.x + (sfgh.x - bypassWp.x) * seg2;
+          droneY = bypassWp.y + (sfgh.y - bypassWp.y) * seg2;
+        }
+      } else {
+        droneX = ucsf.x + (sfgh.x - ucsf.x) * cycle;
+        droneY = ucsf.y + (sfgh.y - ucsf.y) * cycle;
+      }
+
+      // Drone Core Marker
+      ctx.fillStyle = '#34d399';
       ctx.beginPath();
-      ctx.arc(droneA_x, droneA_y, 7, 0, Math.PI * 2);
+      ctx.arc(droneX, droneY, 7, 0, Math.PI * 2);
       ctx.fill();
 
-      // Pulsing Ring
-      const pulseR = 7 + (Math.sin(t * 0.1) + 1) * 6;
-      ctx.strokeStyle = 'rgba(52, 168, 83, 0.5)';
+      // Pulsing Beacon Ping
+      const beaconR = 7 + (Math.sin(t * 0.12) + 1) * 5;
+      ctx.strokeStyle = hasActiveObstacles ? 'rgba(251, 146, 60, 0.7)' : 'rgba(52, 211, 153, 0.7)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(droneA_x, droneA_y, pulseR, 0, Math.PI * 2);
+      ctx.arc(droneX, droneY, beaconR, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.fillStyle = '#34a853';
-      ctx.font = 'bold 10px monospace';
-      ctx.fillText('LIFEDRONE-ALPHA (3.8°C | 110 km/h)', droneA_x + 12, droneA_y + 4);
+      // Tactical Drone HUD Tag
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('LIFEDRONE-ALPHA (150m AGL)', droneX + 12, droneY - 2);
+      ctx.fillStyle = '#6ee7b7';
+      ctx.font = '9px monospace';
+      ctx.fillText(hasActiveObstacles ? 'REROUTED · 3.8°C NOMINAL' : 'DIRECT CORRIDOR · 3.8°C', droneX + 12, droneY + 10);
 
       t += 1;
       animId = requestAnimationFrame(render);
@@ -285,7 +525,9 @@ export function TraumaDroneMissionControlView() {
 
     render();
     return () => cancelAnimationFrame(animId);
-  }, []);
+  }, [obstacles]);
+
+  const activeATC = atcClearances[activeATCIndex] || atcClearances[0];
 
   return (
     <div className="pt-20 pb-16 px-4 sm:px-6 max-w-7xl mx-auto space-y-6">
@@ -302,28 +544,40 @@ export function TraumaDroneMissionControlView() {
             </h1>
             <p className="text-sm text-slate-300 mt-1 max-w-3xl">
               Real-time ATLS Class I-IV Hemorrhagic Shock staging, automated MTP hemostatic pack synthesis,
-              dynamic eVTOL obstacle avoidance routing, and 2°C–6°C IoT cold-chain telemetry.
+              dynamic polygon waypoint obstacle rerouting, FAA Part 135 synthesized radio ATC, and cryptographic 2°C–6°C cold-chain proof.
             </p>
           </div>
 
-          <button
-            onClick={() => setSwapModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1a73e8] to-[#4285f4] text-white text-sm font-bold shadow-md hover:shadow-lg transition-all"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Initiate Hospital Swap</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleInspectCustody('DRONE-V5-ALPHA')}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-bold transition-all shadow-sm"
+            >
+              <FileCheck className="w-4 h-4 text-emerald-400" />
+              <span>CoC Passport</span>
+            </button>
+
+            <button
+              onClick={() => setSwapModalOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#1a73e8] to-[#4285f4] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Hospital Swap</span>
+            </button>
+          </div>
         </div>
 
         {/* Live Metrics Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/10">
           <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-            <div className="text-xs text-slate-400">Active Airspace Couriers</div>
+            <div className="text-xs text-slate-400">Airspace Couriers</div>
             <div className="text-xl font-black text-[#4ade80] flex items-center gap-2 mt-0.5">
-              <span>2 In-Flight</span>
+              <span>{airspaceData?.activeDrones?.length || 2} In-Flight</span>
               <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-ping" />
             </div>
-            <div className="text-[11px] text-slate-300">100% On-Schedule</div>
+            <div className="text-[11px] text-slate-300">
+              {obstacles.length > 0 ? '⚠️ Dynamic Reroutes Active' : 'Direct Corridors Nominal'}
+            </div>
           </div>
 
           <div className="bg-white/5 p-3 rounded-xl border border-white/10">
@@ -348,42 +602,106 @@ export function TraumaDroneMissionControlView() {
 
       {dispatchFeedback && (
         <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm animate-fade-in">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <span>{dispatchFeedback}</span>
         </div>
       )}
 
       {/* Main Grid: Airspace Radar (Left) & Shock Triage (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Airspace Radar Map (7 cols) */}
+        {/* Left Column: Airspace Radar Map & ATC Terminal (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
+          {/* Tactical Radar Card */}
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Radio className="w-5 h-5 text-[#1a73e8]" />
                 <h2 className="font-bold text-base text-slate-800">
-                  Autonomous eVTOL Airspace Radar & Geofenced Corridors
+                  Autonomous eVTOL Airspace Radar & Tactical Geofences
                 </h2>
               </div>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold">
-                ADS-B ACTIVE
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full font-bold border ${
+                  obstacles.length > 0
+                    ? 'bg-amber-50 text-amber-800 border-amber-300'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                }`}>
+                  {obstacles.length > 0 ? 'CORRIDOR REROUTE ACTIVE' : 'ADS-B DIRECT NOMINAL'}
+                </span>
+              </div>
+            </div>
+
+            {/* Tactical Anomaly Injector Toolbar */}
+            <div className="p-3 bg-slate-900 rounded-xl text-xs space-y-2 border border-slate-800">
+              <div className="flex items-center justify-between text-slate-400 font-mono text-[11px]">
+                <span className="flex items-center gap-1.5 text-slate-200 font-bold">
+                  <Wind className="w-3.5 h-3.5 text-amber-400" />
+                  <span>TACTICAL AIRSPACE ANOMALY INJECTOR</span>
+                </span>
+                <span>Active Hazards: <strong className="text-white">{obstacles.length}</strong></span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap pt-1">
+                <button
+                  onClick={() => handleInjectObstacle(
+                    'HIGH_WIND_MICROBURST',
+                    'Mission District Microburst',
+                    44,
+                    1300,
+                    '44 kt wind shear cell crossing primary hospital flight path'
+                  )}
+                  disabled={anomalyLoading}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold flex items-center gap-1.5 transition-all"
+                >
+                  <Wind className="w-3 h-3" />
+                  <span>+ High-Wind Cell (44 kts)</span>
+                </button>
+
+                <button
+                  onClick={() => handleInjectObstacle(
+                    'TEMPORARY_FLIGHT_RESTRICTION',
+                    'FAA Emergency Incident TFR',
+                    0,
+                    1500,
+                    'Emergency VIP/Fire TFR geofence Part 135 restriction'
+                  )}
+                  disabled={anomalyLoading}
+                  className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-semibold flex items-center gap-1.5 transition-all"
+                >
+                  <AlertTriangle className="w-3 h-3" />
+                  <span>+ Emergency TFR Geofence</span>
+                </button>
+
+                {obstacles.length > 0 && (
+                  <button
+                    onClick={handleClearObstacles}
+                    disabled={anomalyLoading}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold flex items-center gap-1.5 ml-auto transition-all"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>Clear Hazards</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Canvas Area */}
-            <div className="relative rounded-xl overflow-hidden border border-slate-300">
+            <div className="relative rounded-xl overflow-hidden border border-slate-300 shadow-inner">
               <canvas
                 ref={canvasRef}
                 width={700}
-                height={380}
+                height={390}
                 className="w-full h-auto block"
               />
-              <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white text-xs font-mono flex items-center gap-3">
+              <div className="absolute bottom-3 left-3 bg-black/75 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white text-[11px] font-mono flex items-center gap-3 border border-white/10">
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-blue-500" /> Trauma Centers
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> Drones
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> Drone Couriers
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" /> Active Hazards
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-red-500" /> NFZs
@@ -391,22 +709,127 @@ export function TraumaDroneMissionControlView() {
               </div>
             </div>
 
+            {/* Dynamic Reroute Flight Telemetry Pill */}
+            {reroutePlan && reroutePlan.rerouted && (
+              <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs space-y-1">
+                <div className="flex items-center justify-between font-bold text-amber-900">
+                  <span className="flex items-center gap-1.5">
+                    <Navigation className="w-4 h-4 text-amber-700" />
+                    <span>Dynamic Polygon Bypass Corridor Active</span>
+                  </span>
+                  <span className="font-mono text-xs">ETA: +{reroutePlan.extraEtaMin} min ({reroutePlan.revisedEtaMin} min total)</span>
+                </div>
+                <div className="text-amber-800 text-[11px] flex justify-between">
+                  <span>Detour: +{reroutePlan.extraDistKm} km</span>
+                  <span>Battery Reserve: -{reroutePlan.totalBatteryDrainPct}%</span>
+                  <span>Peltier Cooling Load: {reroutePlan.peltierCoolingWatts}W (3.8°C Target)</span>
+                </div>
+              </div>
+            )}
+
             {/* Live Drone Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {(airspaceData?.activeDrones || []).map((drone) => (
-                <div key={drone.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
-                  <div className="flex justify-between font-bold text-slate-800">
-                    <span>{drone.callsign}</span>
-                    <span className="text-emerald-600">{drone.status}</span>
+                <div key={drone.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs hover:border-slate-300 transition-colors">
+                  <div className="flex justify-between items-center font-bold text-slate-800">
+                    <span className="text-sm font-extrabold text-slate-900">{drone.callsign}</span>
+                    <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-mono text-[10px]">
+                      {drone.status}
+                    </span>
                   </div>
-                  <div className="text-slate-500">Payload: <strong className="text-slate-700">{drone.payload.units}x {drone.payload.component} ({drone.payload.bloodType})</strong></div>
-                  <div className="flex items-center justify-between text-slate-600 font-mono text-[11px] pt-1 border-t border-slate-200">
+                  <div className="text-slate-600">
+                    Payload: <strong className="text-slate-800">{drone.payload.units}x {drone.payload.component} ({drone.payload.bloodType})</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600 font-mono text-[11px] pt-1.5 border-t border-slate-200">
                     <span>Temp: <strong className="text-amber-600">{drone.coldChain.temperatureCelsius}°C</strong></span>
                     <span>Speed: {drone.speedKmh} km/h</span>
-                    <span>Battery: {drone.batteryPercent}%</span>
+                    <span>Batt: {drone.batteryPercent}%</span>
+                  </div>
+                  <div className="pt-1 flex items-center justify-between">
+                    <button
+                      onClick={() => handleInspectCustody(drone.id)}
+                      className="text-[11px] font-bold text-[#1a73e8] hover:underline flex items-center gap-1"
+                    >
+                      <FileCheck className="w-3.5 h-3.5" />
+                      <span>Inspect Custody Token</span>
+                    </button>
+                    <span className="text-[10px] text-slate-400 font-mono">120m AGL</span>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* FAA Synthesized Radio ATC Co-Pilot Card */}
+          <div className="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-xl text-white space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Volume2 className="w-5 h-5 text-emerald-400" />
+                <h2 className="font-bold text-base text-white tracking-tight">
+                  FAA Part 135 Radio Air-Traffic Control (ATC) Co-Pilot
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/10 text-emerald-400 border border-emerald-400/30">
+                  VHF 124.700 MHz · SQUAWK {activeATC?.clearance?.squawk || '4217'}
+                </span>
+              </div>
+            </div>
+
+            {/* Broadcast Control & Audio Key */}
+            <div className="p-3.5 bg-black/40 rounded-xl border border-white/10 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full ${isBroadcastingATC ? 'bg-emerald-400 animate-ping' : 'bg-slate-600'}`} />
+                  <span className="text-xs font-mono text-slate-300">
+                    {isBroadcastingATC ? 'TRANSMITTING ON FREQUENCY 124.700' : 'STANDBY · CARRIER SQUELCH READY'}
+                  </span>
+                </div>
+
+                <button
+                  onClick={handlePlayActiveATC}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-md ${
+                    isBroadcastingATC
+                      ? 'bg-rose-600 text-white hover:bg-rose-700 animate-pulse'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-500'
+                  }`}
+                >
+                  {isBroadcastingATC ? (
+                    <>
+                      <Square className="w-3.5 h-3.5" />
+                      <span>Halt Radio Broadcast</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3.5 h-3.5" />
+                      <span>Broadcast FAA Voice Clearance</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Live ATC Script Transcript */}
+              <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 font-mono text-xs text-emerald-300/90 leading-relaxed">
+                <div className="text-[10px] text-slate-500 mb-1">
+                  [{new Date().toLocaleTimeString('en-US', { hour12: false })} UTC] TRANSMISSION DISPATCH:
+                </div>
+                "{activeATC?.clearance?.radioClearanceText ||
+                  'LifeStream Lifter-01, Bay Approach Radar Control. Wind 270 at 14 knots. Cleared corridor Alpha direct.'}"
+              </div>
+
+              {/* Flight Directives Tags */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                {(activeATC?.clearance?.flightDirectives || [
+                  'CLEARED CORRIDOR ALPHA-9 DIRECT',
+                  'CRUISE 120m AGL',
+                  'SQUAWK 4217'
+                ]).map((dir, idx) => (
+                  <span key={idx} className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300">
+                    ◈ {dir}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -453,7 +876,7 @@ export function TraumaDroneMissionControlView() {
                 <button
                   onClick={testCrossMatch}
                   disabled={crossMatchLoading}
-                  className="w-full text-xs font-bold py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all flex items-center justify-center gap-1.5"
+                  className="w-full text-xs font-bold py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{crossMatchLoading ? 'Analyzing...' : 'Run Coombs Test'}</span>
@@ -462,14 +885,14 @@ export function TraumaDroneMissionControlView() {
             </div>
 
             {crossMatchResult && (
-              <div className={`p-3 rounded-xl border text-xs space-y-1 ${
+              <div className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
                 crossMatchResult.aboRhCompatible
                   ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                   : 'bg-rose-50 border-rose-200 text-rose-900'
               }`}>
-                <div className="flex justify-between font-bold">
-                  <span>Compatibility: {crossMatchResult.aboRhCompatible ? '✅ COMPATIBLE' : '❌ INCOMPATIBLE'}</span>
-                  <span>Coombs: {crossMatchResult.coombsTestResult}</span>
+                <div className="flex justify-between font-bold text-sm">
+                  <span>Compatibility: {crossMatchResult.aboRhCompatible ? '✅ CLINICALLY COMPATIBLE' : '❌ INCOMPATIBLE REACTION'}</span>
+                  <span className="font-mono text-xs">{crossMatchResult.coombsTestResult}</span>
                 </div>
                 <div className="text-[11px] text-slate-600 font-mono">
                   Clearance Token: {crossMatchResult.cryptographicClearanceToken}
@@ -480,14 +903,15 @@ export function TraumaDroneMissionControlView() {
           </div>
         </div>
 
-        {/* Right Column: Shock Index & MTP Staging (5 cols) */}
+        {/* Right Column: Shock Index, MTP Staging & Swaps (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
+          {/* ATLS Shock Triage & MTP Staging Card */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
                 <h2 className="font-bold text-base text-slate-800">
-                  ATLS Hemorrhagic Shock Triage & MTP Stager
+                  ATLS Shock Triage & MTP Hemostatic Stager
                 </h2>
               </div>
               <button
@@ -499,7 +923,7 @@ export function TraumaDroneMissionControlView() {
               </button>
             </div>
 
-            {/* Input Sliders */}
+            {/* Sliders */}
             <div className="space-y-3">
               <div>
                 <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
@@ -559,7 +983,7 @@ export function TraumaDroneMissionControlView() {
               <div className="p-4 bg-slate-900 text-white rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">Calculated Shock Index</span>
-                  <span className="font-mono font-bold text-lg text-amber-400">
+                  <span className="font-mono font-bold text-base text-amber-400">
                     SI: {triageData.shockIndex} (Age-SI: {triageData.ageShockIndex})
                   </span>
                 </div>
@@ -625,7 +1049,7 @@ export function TraumaDroneMissionControlView() {
               {swaps.map(s => (
                 <div key={s.id} className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
                   <div className="flex justify-between font-semibold text-slate-800">
-                    <span className="text-[#1a73e8]">{s.id}</span>
+                    <span className="text-[#1a73e8] font-bold">{s.id}</span>
                     <span className="text-emerald-700 font-mono text-[10px] bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                       {s.status}
                     </span>
@@ -642,6 +1066,90 @@ export function TraumaDroneMissionControlView() {
           </div>
         </div>
       </div>
+
+      {/* Modal: Cryptographic Cold-Chain Proof of Custody Passport */}
+      {custodyModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-scale-in">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <Award className="w-5 h-5 text-emerald-600" />
+                <h3 className="font-bold text-base text-slate-900">Cryptographic Chain-of-Custody (CoC) Passport</h3>
+              </div>
+              <button onClick={() => setCustodyModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {custodyLoading || !custodyPassport ? (
+              <div className="py-8 text-center text-xs text-slate-500 font-mono">
+                Verifying SHA-256 block hash & cold-chain thermal sensors...
+              </div>
+            ) : (
+              <div className="space-y-4 text-xs">
+                {/* Status Ribbon */}
+                <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center justify-between text-emerald-900">
+                  <div className="flex items-center gap-2 font-bold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>CERTIFIED MEDICAL INTEGRITY</span>
+                  </div>
+                  <span className="font-mono text-[11px] text-emerald-800">{custodyPassport.passportId}</span>
+                </div>
+
+                {/* Batch Hash & Token */}
+                <div className="p-3 bg-slate-900 text-white rounded-xl space-y-2 font-mono text-[11px]">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">SHA-256 PAYLOAD BATCH HASH</span>
+                    <span className="text-amber-400 break-all">{custodyPassport.batchHash}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">ECDSA VERIFICATION SIGNATURE</span>
+                    <span className="text-slate-300 break-all">{custodyPassport.digitalSignature}</span>
+                  </div>
+                </div>
+
+                {/* Thermal Sensor Ledger */}
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                    <div className="text-[10px] text-slate-500">Allowable Minimum</div>
+                    <div className="text-sm font-black text-blue-600 mt-0.5">{custodyPassport.thermalBoundaryLog.minThresholdCelsius}°C</div>
+                  </div>
+
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                    <div className="text-[10px] text-slate-500">Current Measured</div>
+                    <div className="text-sm font-black text-emerald-600 mt-0.5">{custodyPassport.thermalBoundaryLog.recordedCurrentCelsius}°C</div>
+                  </div>
+
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                    <div className="text-[10px] text-slate-500">Allowable Maximum</div>
+                    <div className="text-sm font-black text-rose-600 mt-0.5">{custodyPassport.thermalBoundaryLog.maxThresholdCelsius}°C</div>
+                  </div>
+                </div>
+
+                {/* Pathologist Endorsement */}
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-[11px]">
+                  <div>
+                    <div className="text-slate-500">Attesting Pathologist:</div>
+                    <div className="font-bold text-slate-800">{custodyPassport.verifyingPathologist}</div>
+                  </div>
+                  <div className="font-mono text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded">
+                    SEAL INTACT
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    onClick={() => setCustodyModalOpen(false)}
+                    className="px-4 py-2 bg-slate-800 text-white rounded-lg font-bold text-xs hover:bg-slate-900"
+                  >
+                    Close Passport
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Modal: Initiate Swap */}
       {swapModalOpen && (
