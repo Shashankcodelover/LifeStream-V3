@@ -11,16 +11,16 @@ export function TelemetryOverlay({
   onConfirmReceipt
 }) {
   const [isMinimized, setIsMinimized] = useState(false);
+  const [showIntakeModal, setShowIntakeModal] = useState(false);
+  const [nurseName, setNurseName] = useState('');
+  const [nurseBadge, setNurseBadge] = useState('RN-8021');
+
   const activeList = dispatches.filter(d => d.status === 'En Route' || d.status === 'Arrived');
   if (activeList.length === 0) return null;
 
   const currentDispatch = activeList.find(d => d.id === focusedDispatchId) || activeList[0];
   const isArrived = currentDispatch.status === 'Arrived';
   const isColdSafe = currentDispatch.tempCelsius >= 2.0 && currentDispatch.tempCelsius <= 6.0;
-
-  const [showIntakeModal, setShowIntakeModal] = useState(false);
-  const [nurseName, setNurseName] = useState('');
-  const [nurseBadge, setNurseBadge] = useState('RN-8021');
 
   const handleIntakeSubmit = (e) => {
     e.preventDefault();
