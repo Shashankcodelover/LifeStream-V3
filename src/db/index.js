@@ -130,6 +130,13 @@ const INITIAL_DATA = {
   transfers: [],
   alerts: [
     { id: 'ALT-101', hospitalId: 'HOSP-02', bloodType: 'O-', urgency: 'critical', message: 'Critical O- Universal Donor shortage for trauma emergency at UCSF Parnassus.', createdAt: new Date().toISOString() }
+  ],
+  relations: [
+    { id: 'REL-01', fromHospitalId: 'HOSP-01', toHospitalId: 'HOSP-02', relationType: 'trauma_escalation', notes: 'Primary Level-1 Trauma Mutual Aid & Surge Route', createdAt: '2026-06-01T00:00:00.000Z' },
+    { id: 'REL-02', fromHospitalId: 'HOSP-02', toHospitalId: 'HOSP-04', relationType: 'pediatric_transfer', notes: 'Pediatric & Neonatal Resuscitation Emergency Channel', createdAt: '2026-06-15T00:00:00.000Z' },
+    { id: 'REL-03', fromHospitalId: 'HOSP-01', toHospitalId: 'HOSP-03', relationType: 'emergency_reserve', notes: 'Regional Whole Blood & Plasma Reserve Buffer', createdAt: '2026-07-01T00:00:00.000Z' },
+    { id: 'REL-04', fromHospitalId: 'HOSP-04', toHospitalId: 'HOSP-05', relationType: 'drone_corridor', notes: 'Autonomous FAA Part-135 High-Speed Drone Skyway', createdAt: '2026-07-10T00:00:00.000Z' },
+    { id: 'REL-05', fromHospitalId: 'HOSP-03', toHospitalId: 'HOSP-05', relationType: 'surplus_mesh', notes: 'Rare Blood Type (AB-, B-) Cold-Chain Mesh Routing', createdAt: '2026-07-20T00:00:00.000Z' }
   ]
 };
 
@@ -189,6 +196,7 @@ function sanitizeData(data) {
   if (!data.appointments) data.appointments = INITIAL_DATA.appointments;
   if (!data.transfers) data.transfers = [];
   if (!data.alerts) data.alerts = INITIAL_DATA.alerts;
+  if (!data.relations || data.relations.length === 0) data.relations = INITIAL_DATA.relations;
 }
 
 function writeDB(data) {

@@ -2,19 +2,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   X, ShieldAlert, Users, Hospital, Radio, AlertTriangle, CheckCircle,
   XCircle, Trash2, Plus, RefreshCw, BarChart3, ArrowUpRight, Flame,
-  Battery, Thermometer, MapPin, Search, Filter, ShieldCheck, HeartPulse
+  Battery, Thermometer, MapPin, Search, Filter, ShieldCheck, HeartPulse,
+  Network, Share2, Upload, FileText, CheckCircle2, Link2, Database
 } from 'lucide-react';
 import { resilientFetch } from '../api/client';
 
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
 export function AdminPortalModal({ onClose, onDataChange }) {
-  const [activeTab, setActiveTab] = useState('overview'); // overview | donors | hospitals | dispatches | alerts
+  const [activeTab, setActiveTab] = useState('overview'); // overview | donors | hospitals | dispatches | alerts | relations | upload
   const [stats, setStats] = useState(null);
   const [donors, setDonors] = useState([]);
   const [hospitals, setHospitals] = useState([]);
   const [dispatches, setDispatches] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [relations, setRelations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Filter states for donors
@@ -49,16 +51,32 @@ export function AdminPortalModal({ onClose, onDataChange }) {
     message: ''
   });
 
+  // Relations form
+  const [showAddRelation, setShowAddRelation] = useState(false);
+  const [newRelation, setNewRelation] = useState({
+    fromHospitalId: 'HOSP-01',
+    toHospitalId: 'HOSP-02',
+    relationType: 'trauma_escalation',
+    notes: ''
+  });
+
+  // Bulk Ingestion State
+  const [uploadType, setUploadType] = useState('donors'); // donors | hospitals | requests
+  const [csvText, setCsvText] = useState('');
+  const [uploadResult, setUploadResult] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
   // Fetch all admin data
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
-      const [statsRes, donorsRes, hospitalsRes, dispatchesRes, alertsRes] = await Promise.all([
+      const [statsRes, donorsRes, hospitalsRes, dispatchesRes, alertsRes, relationsRes] = await Promise.all([
         resilientFetch('/api/admin/stats'),
         resilientFetch(`/api/admin/donors?search=${encodeURIComponent(donorSearch)}&bloodType=${donorBloodFilter}&verified=${donorVerifiedFilter}`),
         resilientFetch('/api/admin/hospitals'),
         resilientFetch('/api/admin/dispatches'),
-        resilientFetch('/api/admin/alerts')
+        resilientFetch('/api/admin/alerts'),
+        resilientFetch('/api/admin/relations')
       ]);
 
       setStats(statsRes);
@@ -66,6 +84,7 @@ export function AdminPortalModal({ onClose, onDataChange }) {
       setHospitals(hospitalsRes || []);
       setDispatches(dispatchesRes || []);
       setAlerts(alertsRes || []);
+      setRelations(relationsRes || []);
     } catch (err) {
       console.error('Error fetching admin data:', err);
     } finally {
@@ -202,6 +221,106 @@ export function AdminPortalModal({ onClose, onDataChange }) {
     }
   };
 
+  // Hospital Deletion
+  const deleteHospital = async (id) => {
+    if (!confirm('Are you sure you want to remove this hospital center and sever its mutual aid connections?')) return;
+    try {
+      await resilientFetch(`/api/hospitals/${id}`, { method: 'DELETE' });
+      fetchAllData();
+      if (onDataChange) onDataChange();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Inter-Hospital Relation Actions
+  const handleCreateRelation = async (e) => {
+    e.preventDefault();
+    if (newRelation.fromHospitalId === newRelation.toHospitalId) {
+      alert('Source and target hospitals must be different.');
+      return;
+    }
+    try {
+      await resilientFetch('/api/admin/relations', {
+        method: 'POST',
+        body: JSON.stringify(newRelation)
+      });
+      setShowAddRelation(false);
+      setNewRelation({
+        fromHospitalId: 'HOSP-01',
+        toHospitalId: 'HOSP-02',
+        relationType: 'trauma_escalation',
+        notes: ''
+      });
+      fetchAllData();
+      if (onDataChange) onDataChange();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteRelation = async (id) => {
+    if (!confirm('Are you sure you want to sever this mutual aid relationship link?')) return;
+    try {
+      await resilientFetch(`/api/admin/relations/${id}`, { method: 'DELETE' });
+      fetchAllData();
+      if (onDataChange) onDataChange();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Sample CSV Presets
+  const loadSampleCSV = (type) => {
+    setUploadResult(null);
+    if (type === 'donors') {
+      setCsvText(
+`name,bloodType,phone,lat,lng,hospitalAffiliation
+Dr. Robert Lang,O-,+1 415-555-8811,37.7712,-122.4221,HOSP-01
+Elena Rostova,B+,+1 415-555-8822,37.7820,-122.4180,HOSP-02
+Marcus Vance,O-,+1 415-555-8833,37.7650,-122.4310,HOSP-01
+Sarah Jenkins,A+,+1 415-555-8844,37.7590,-122.4450,HOSP-03`
+      );
+    } else if (type === 'hospitals') {
+      setCsvText(
+`name,code,lat,lng,phone,helipad,O-,O+,A+,A-,B+,B-,AB+,AB-
+Mission District Trauma Hub,MDTH,37.7599,-122.4148,+1 415-555-1100,true,4,8,12,4,6,2,5,3
+Sunset Regional Clinic,SRC,37.7533,-122.4941,+1 415-555-2200,false,2,5,8,3,4,1,3,1`
+      );
+    } else {
+      setCsvText(
+`patientName,bloodType,unitsRequired,urgency,hospitalId,contactPhone,medicalReason
+Patient Vance,O-,2,critical,HOSP-01,+1 415-555-9011,Emergency surgery vascular trauma
+Liam Chen,A+,1,urgent,HOSP-02,+1 415-555-9022,Pediatric emergency transfusion
+Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock`
+      );
+    }
+  };
+
+  // Bulk Ingestion Execution
+  const handleExecuteUpload = async () => {
+    if (!csvText.trim()) return;
+    setUploading(true);
+    setUploadResult(null);
+    try {
+      let endpoint = '/api/donors/upload';
+      if (uploadType === 'hospitals') endpoint = '/api/hospitals/upload';
+      else if (uploadType === 'requests') endpoint = '/api/requests/upload';
+
+      const res = await resilientFetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ csvText })
+      });
+      setUploadResult(res);
+      fetchAllData();
+      if (onDataChange) onDataChange();
+    } catch (err) {
+      setUploadResult({ error: err.message || 'Upload failed' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div
@@ -302,6 +421,30 @@ export function AdminPortalModal({ onClose, onDataChange }) {
           >
             <AlertTriangle className="w-4 h-4 text-amber-600" />
             <span>Emergency Alerts ({alerts.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('relations')}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all ${
+              activeTab === 'relations'
+                ? 'bg-rose-50 text-rose-600 border border-rose-200 shadow-sm font-bold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Network className="w-4 h-4 text-purple-600" />
+            <span>Healthcare Mesh & Relations ({relations.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('upload')}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all ${
+              activeTab === 'upload'
+                ? 'bg-rose-50 text-rose-600 border border-rose-200 shadow-sm font-bold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Upload className="w-4 h-4 text-emerald-600" />
+            <span>Bulk Ingestion Engine</span>
           </button>
         </div>
 
@@ -730,9 +873,18 @@ export function AdminPortalModal({ onClose, onDataChange }) {
                         <p className="text-[11px] text-slate-500 font-mono mt-0.5">GPS: [{h.lat}, {h.lng}]</p>
                       </div>
 
-                      <span className="text-xs font-bold text-slate-700">
-                        Total Stock: {Object.values(h.inventory || {}).reduce((a, b) => a + b, 0)} Units
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-slate-700">
+                          Total Stock: {Object.values(h.inventory || {}).reduce((a, b) => a + b, 0)} Units
+                        </span>
+                        <button
+                          onClick={() => deleteHospital(h.id)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-slate-200"
+                          title="Delete Medical Center"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
@@ -973,6 +1125,325 @@ export function AdminPortalModal({ onClose, onDataChange }) {
                       </button>
                     </div>
                   ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: HEALTHCARE MESH & RELATIONS */}
+          {activeTab === 'relations' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Network className="w-4 h-4 text-purple-600" />
+                    <h4 className="text-xs font-bold text-slate-900">Inter-Hospital Mutual Aid Mesh & Corridors</h4>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Define cross-facility triage, drone flight corridors, and pediatric contingency links</p>
+                </div>
+                <button
+                  onClick={() => setShowAddRelation(!showAddRelation)}
+                  className="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Establish Mutual Aid Link</span>
+                </button>
+              </div>
+
+              {/* Add Relation Form */}
+              {showAddRelation && (
+                <form onSubmit={handleCreateRelation} className="bg-white border border-purple-300 p-4 rounded-2xl shadow-sm grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Source Medical Center</label>
+                    <select
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900"
+                      value={newRelation.fromHospitalId}
+                      onChange={e => setNewRelation(r => ({ ...r, fromHospitalId: e.target.value }))}
+                    >
+                      {hospitals.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Target Medical Center</label>
+                    <select
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900"
+                      value={newRelation.toHospitalId}
+                      onChange={e => setNewRelation(r => ({ ...r, toHospitalId: e.target.value }))}
+                    >
+                      {hospitals.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Corridor Archetype</label>
+                    <select
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-semibold"
+                      value={newRelation.relationType}
+                      onChange={e => setNewRelation(r => ({ ...r, relationType: e.target.value }))}
+                    >
+                      <option value="trauma_escalation">Level-1 Trauma Escalation</option>
+                      <option value="pediatric_transfer">Pediatric & Neonatal Transfer</option>
+                      <option value="emergency_reserve">Emergency Reserve Backup</option>
+                      <option value="drone_corridor">Autonomous Air Corridor</option>
+                      <option value="surplus_mesh">Surplus Rebalancing Mesh</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Protocol Notes</label>
+                    <div className="flex gap-2">
+                      <input
+                        className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900"
+                        placeholder="e.g. Priority emergency corridor"
+                        value={newRelation.notes}
+                        onChange={e => setNewRelation(r => ({ ...r, notes: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-4 flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddRelation(false)}
+                      className="px-3 py-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg text-xs font-semibold"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg transition-all shadow-sm"
+                    >
+                      Confirm & Establish Corridor
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Relations Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {relations.length === 0 ? (
+                  <div className="col-span-2 bg-white border border-slate-200 p-12 text-center rounded-3xl text-slate-500 text-sm shadow-sm">
+                    No active inter-hospital relations established. Click &apos;Establish Mutual Aid Link&apos; to link trauma centers.
+                  </div>
+                ) : (
+                  relations.map(rel => {
+                    const fromHosp = hospitals.find(h => h.id === rel.fromHospitalId);
+                    const toHosp = hospitals.find(h => h.id === rel.toHospitalId);
+
+                    const typeStyles = {
+                      trauma_escalation: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', label: 'Trauma Escalation' },
+                      pediatric_transfer: { bg: 'bg-sky-50', border: 'border-sky-200', text: 'text-sky-700', label: 'Pediatric Transfer' },
+                      emergency_reserve: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', label: 'Emergency Reserve' },
+                      drone_corridor: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', label: 'Airspace Drone Corridor' },
+                      surplus_mesh: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', label: 'Surplus Mesh' }
+                    }[rel.relationType] || { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-700', label: rel.relationType };
+
+                    return (
+                      <div key={rel.id} className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-3">
+                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${typeStyles.bg} ${typeStyles.border} ${typeStyles.text}`}>
+                              {typeStyles.label}
+                            </span>
+                            <span className="text-[10px] font-mono text-slate-400 font-bold">{rel.id}</span>
+                          </div>
+
+                          {/* Hospital Node Link */}
+                          <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Origin Facility</span>
+                              <p className="text-xs font-bold text-slate-800 truncate">{fromHosp ? fromHosp.name : rel.fromHospitalId}</p>
+                              <span className="text-[10px] font-mono text-slate-500">{rel.fromHospitalId}</span>
+                            </div>
+
+                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 shadow-inner">
+                              <Link2 className="w-4 h-4" />
+                            </div>
+
+                            <div className="flex-1 min-w-0 text-right">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Destination Facility</span>
+                              <p className="text-xs font-bold text-slate-800 truncate">{toHosp ? toHosp.name : rel.toHospitalId}</p>
+                              <span className="text-[10px] font-mono text-slate-500">{rel.toHospitalId}</span>
+                            </div>
+                          </div>
+
+                          {rel.notes && (
+                            <p className="text-[11px] text-slate-600 mt-2.5 px-1 italic">
+                              &ldquo;{rel.notes}&rdquo;
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100">
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {rel.createdAt ? new Date(rel.createdAt).toLocaleDateString() : 'Active'}
+                          </span>
+                          <button
+                            onClick={() => deleteRelation(rel.id)}
+                            className="flex items-center gap-1 text-[11px] font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg border border-rose-200 transition-all"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Sever Link</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: BULK DATA INGESTION ENGINE */}
+          {activeTab === 'upload' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-emerald-600" />
+                    <h4 className="text-xs font-bold text-slate-900">Enterprise Bulk Ingestion Engine</h4>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Ingest CSV or JSON payloads directly into Live operational databases</p>
+                </div>
+
+                {/* Ingestion Target Selector */}
+                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
+                  <button
+                    onClick={() => { setUploadType('donors'); setCsvText(''); setUploadResult(null); }}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
+                      uploadType === 'donors'
+                        ? 'bg-white text-slate-900 shadow-sm font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Donors</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setUploadType('hospitals'); setCsvText(''); setUploadResult(null); }}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
+                      uploadType === 'hospitals'
+                        ? 'bg-white text-slate-900 shadow-sm font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Hospital className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Hospitals</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setUploadType('requests'); setCsvText(''); setUploadResult(null); }}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
+                      uploadType === 'requests'
+                        ? 'bg-white text-slate-900 shadow-sm font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Requests</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Upload Workspace */}
+              <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    CSV / TSV Ingestion Stream ({uploadType.toUpperCase()})
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => loadSampleCSV(uploadType)}
+                      className="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1 rounded-lg transition-all flex items-center gap-1"
+                    >
+                      <FileText className="w-3 h-3" />
+                      <span>Load Sample Template</span>
+                    </button>
+                    {csvText && (
+                      <button
+                        onClick={() => { setCsvText(''); setUploadResult(null); }}
+                        className="text-xs text-slate-500 hover:text-slate-800 px-2 py-1"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <textarea
+                  className="w-full h-44 bg-slate-900 text-emerald-400 font-mono text-xs p-3.5 rounded-2xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed resize-none"
+                  placeholder="Paste raw CSV or structured TSV text here..."
+                  value={csvText}
+                  onChange={e => setCsvText(e.target.value)}
+                />
+
+                {/* Upload Status / Results */}
+                {uploadResult && (
+                  <div className={`p-3.5 rounded-xl border text-xs flex items-center gap-3 ${
+                    uploadResult.error
+                      ? 'bg-rose-50 border-rose-200 text-rose-800'
+                      : 'bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold'
+                  }`}>
+                    {uploadResult.error ? (
+                      <>
+                        <XCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                        <div>
+                          <p className="font-bold">Ingestion Failed</p>
+                          <p className="text-[11px] text-rose-700">{uploadResult.error}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <div>
+                          <p className="font-bold">{uploadResult.message || 'Records Ingested Successfully'}</p>
+                          <p className="text-[11px] text-emerald-700">
+                            Processed {uploadResult.count || uploadResult.insertedCount || (uploadResult.donors && uploadResult.donors.length) || (uploadResult.hospitals && uploadResult.hospitals.length) || 1} records into primary registry.
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-[11px] text-slate-500">
+                    {csvText.trim() ? `${csvText.trim().split('\n').length - 1} data rows detected` : 'No payload staged'}
+                  </span>
+                  <button
+                    onClick={handleExecuteUpload}
+                    disabled={uploading || !csvText.trim()}
+                    className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                      uploading || !csvText.trim()
+                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                        : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                    }`}
+                  >
+                    <Upload className={`w-3.5 h-3.5 ${uploading ? 'animate-bounce' : ''}`} />
+                    <span>{uploading ? 'Ingesting Payload...' : 'Execute Batch Ingestion'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Schema Reference Guide */}
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl text-xs text-slate-600">
+                <span className="font-bold text-slate-800 block mb-1.5">Required Schema Specification</span>
+                {uploadType === 'donors' && (
+                  <p className="font-mono text-[11px] text-slate-700">
+                    Headers: <code className="bg-slate-200 px-1 py-0.5 rounded text-rose-600 font-bold">name,bloodType,phone,lat,lng,hospitalAffiliation</code>
+                  </p>
+                )}
+                {uploadType === 'hospitals' && (
+                  <p className="font-mono text-[11px] text-slate-700">
+                    Headers: <code className="bg-slate-200 px-1 py-0.5 rounded text-blue-600 font-bold">name,code,lat,lng,phone,helipad,O-,O+,A+,A-,B+,B-,AB+,AB-</code>
+                  </p>
+                )}
+                {uploadType === 'requests' && (
+                  <p className="font-mono text-[11px] text-slate-700">
+                    Headers: <code className="bg-slate-200 px-1 py-0.5 rounded text-amber-600 font-bold">patientName,bloodType,unitsRequired,urgency,hospitalId,contactPhone,medicalReason</code>
+                  </p>
                 )}
               </div>
             </div>

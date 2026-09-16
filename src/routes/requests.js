@@ -64,6 +64,76 @@ router.post('/', (req, res) => {
   });
 });
 
+// POST /api/requests/upload — Bulk upload patient emergency requests
+router.post('/upload', (req, res) => {
+  const { csvText, requestsList } = req.body;
+  const db = readDB();
+  const imported = [];
+  const errors = [];
+
+  let rawList = [];
+  if (Array.isArray(requestsList)) {
+    rawList = requestsList;
+  } else if (typeof csvText === 'string') {
+    const lines = csvText.trim().split('\n');
+    if (lines.length > 0) {
+      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const cols = line.split(',').map(c => c.trim());
+        const row = {};
+        header.forEach((key, idx) => {
+          row[key] = cols[idx] || '';
+        });
+        rawList.push({
+          patientName: row.patient || row.patientname || row.name,
+          bloodType: row.bloodtype || row['blood type'] || row.type,
+          unitsRequired: parseInt(row.units || row.unitsrequired || '1', 10),
+          urgency: row.urgency || 'critical',
+          hospitalId: row.hospitalid || row.hospital || 'HOSP-01',
+          contactPhone: row.phone || row.contactphone,
+          medicalReason: row.reason || row.medicalreason
+        });
+      }
+    }
+  }
+
+  if (!db.requests) db.requests = [];
+
+  rawList.forEach((item, idx) => {
+    if (!item.patientName || !item.bloodType) {
+      errors.push({ row: idx + 1, error: 'Missing patientName or bloodType' });
+      return;
+    }
+    const hospital = db.hospitals.find(h => h.id === item.hospitalId) || db.hospitals[0];
+    const newReq = {
+      id: `REQ-${Date.now().toString().slice(-4)}${idx}`,
+      patientName: item.patientName,
+      bloodType: item.bloodType.toUpperCase(),
+      unitsRequired: Number(item.unitsRequired) || 1,
+      urgency: item.urgency || 'critical',
+      hospitalId: hospital.id,
+      hospitalName: hospital.name,
+      status: 'In Progress',
+      contactPhone: item.contactPhone || '+1 415-555-0911',
+      medicalReason: item.medicalReason || 'Batch Emergency Blood Requirement',
+      createdAt: new Date().toISOString()
+    };
+    db.requests.unshift(newReq);
+    imported.push(newReq);
+  });
+
+  writeDB(db);
+
+  res.status(201).json({
+    message: `Batch imported ${imported.length} emergency requests successfully.`,
+    count: imported.length,
+    imported,
+    errors
+  });
+});
+
 // GET /api/requests/:id — Fetch request details with live donor & surplus matching
 router.get('/:id', (req, res) => {
   const db = readDB();
@@ -96,6 +166,23 @@ router.patch('/:id/status', (req, res) => {
   writeDB(db);
 
   res.json(request);
+});
+
+// DELETE /api/requests/:id — Delete/Cancel emergency request
+router.delete('/:id', (req, res) => {
+  const reqId = req.params.id;
+  const db = readDB();
+  if (!db.requests) db.requests = [];
+
+  const initialLen = db.requests.length;
+  db.requests = db.requests.filter(r => r.id !== reqId);
+
+  if (db.requests.length === initialLen) {
+    return res.status(404).json({ error: 'Emergency request not found' });
+  }
+
+  writeDB(db);
+  res.json({ message: 'Emergency request deleted successfully', id: reqId });
 });
 
 module.exports = router;

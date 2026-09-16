@@ -144,4 +144,21 @@ router.post('/:id/confirm-receipt', (req, res) => {
   });
 });
 
+// DELETE /api/dispatch/:id — Abort or clear dispatch mission
+router.delete('/:id', (req, res) => {
+  const dispatchId = req.params.id;
+  const db = readDB();
+  if (!db.dispatches) db.dispatches = [];
+
+  const initialLen = db.dispatches.length;
+  db.dispatches = db.dispatches.filter(d => d.id !== dispatchId);
+
+  if (db.dispatches.length === initialLen) {
+    return res.status(404).json({ error: 'Dispatch session not found' });
+  }
+
+  writeDB(db);
+  res.json({ message: 'Dispatch mission aborted and removed', id: dispatchId });
+});
+
 module.exports = router;

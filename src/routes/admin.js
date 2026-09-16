@@ -257,4 +257,69 @@ router.delete('/alerts/:id', (req, res) => {
   res.json({ message: 'Alert resolved and dismissed', id: alertId });
 });
 
+// GET /api/admin/relations — List inter-hospital network relations & mutual aid corridors
+router.get('/relations', (req, res) => {
+  const db = readDB();
+  res.json(db.relations || []);
+});
+
+// POST /api/admin/relations — Create new inter-hospital relationship edge
+router.post('/relations', (req, res) => {
+  const { fromHospitalId, toHospitalId, relationType, notes } = req.body;
+  if (!fromHospitalId || !toHospitalId) {
+    return res.status(400).json({ error: 'fromHospitalId and toHospitalId are required' });
+  }
+
+  const db = readDB();
+  if (!db.relations) db.relations = [];
+
+  const newRelation = {
+    id: `REL-${Date.now().toString().slice(-5)}`,
+    fromHospitalId,
+    toHospitalId,
+    relationType: relationType || 'trauma_escalation',
+    notes: notes || 'Strategic Regional Healthcare Mutual Aid Link',
+    createdAt: new Date().toISOString()
+  };
+
+  db.relations.unshift(newRelation);
+  writeDB(db);
+
+  res.status(201).json(newRelation);
+});
+
+// DELETE /api/admin/relations/:id — Sever inter-hospital relationship edge
+router.delete('/relations/:id', (req, res) => {
+  const relId = req.params.id;
+  const db = readDB();
+  if (!db.relations) db.relations = [];
+
+  const initialLen = db.relations.length;
+  db.relations = db.relations.filter(r => r.id !== relId);
+
+  if (db.relations.length === initialLen) {
+    return res.status(404).json({ error: 'Relationship not found' });
+  }
+
+  writeDB(db);
+  res.json({ message: 'Inter-hospital relationship severed successfully', id: relId });
+});
+
+// DELETE /api/admin/requests/:id — Delete/Cancel emergency request
+router.delete('/requests/:id', (req, res) => {
+  const reqId = req.params.id;
+  const db = readDB();
+  if (!db.requests) db.requests = [];
+
+  const initialLen = db.requests.length;
+  db.requests = db.requests.filter(r => r.id !== reqId);
+
+  if (db.requests.length === initialLen) {
+    return res.status(404).json({ error: 'Emergency request not found' });
+  }
+
+  writeDB(db);
+  res.json({ message: 'Emergency request deleted successfully', id: reqId });
+});
+
 module.exports = router;
