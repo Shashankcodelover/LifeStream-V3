@@ -187,6 +187,7 @@ export function Navbar({
       <div className="flex items-center gap-2">
         {/* AI Copilot & Mentor Button */}
         <button
+          id="open-copilot-btn"
           onClick={onOpenCopilot}
           title="Open LifeStream AI Copilot & Clinical Mentor (Ctrl+K)"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] hover:bg-[#d2e3fc] transition-all shadow-xs"

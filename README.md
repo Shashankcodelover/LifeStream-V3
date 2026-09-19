@@ -12,13 +12,16 @@
 ---
 
 ## 🎬 Media Showcase & Screenshot Gallery
-Complete visual documentation and canonical screenshots are available in [`docs/showcase/`](docs/showcase/):
-- 🗺️ [**Geospatial Live Radar Map**](docs/showcase/screenshots/lifestream_radar_map.png)
-- 🏥 [**Regional Blood Reserves & Cross-Match Matrix**](docs/showcase/screenshots/lifestream_reserves.png)
-- 📦 [**Emergency Delivery Tracker with Cold-Chain Telemetry**](docs/showcase/screenshots/lifestream_deliveries.png)
-- 🏆 [**Community Heroes & Center Bookings**](docs/showcase/screenshots/lifestream_community.png)
-- 🚨 [**STAT Emergency Blood Intake Portal**](docs/showcase/screenshots/lifestream_stat_request.png)
-- ⚡ [**1-Click Instant Demo Login Switcher**](docs/showcase/screenshots/lifestream_auth_modal.png)
+Complete visual documentation and uncropped 1920×1080 canonical screenshots are available in [`docs/showcase/screenshots/`](docs/showcase/screenshots/):
+- 🗺️ [**Geospatial Live Radar Map**](docs/showcase/screenshots/01_desktop_live_radar.png)
+- 📦 [**5-Stage Delivery Tracker with Cold-Chain IoT (2°C–6°C)**](docs/showcase/screenshots/02_desktop_delivery_tracker.png)
+- 🩸 [**Clinical MTP 1:1:1 Resuscitation & Extended Phenotype Matrix**](docs/showcase/screenshots/03_desktop_clinical_mtp.png)
+- 💻 [**Algorithmic Studio & Visual Memory State Tracer**](docs/showcase/screenshots/04_desktop_algorithmic_studio.png)
+- 🛡️ [**Proctored Assessment Arena & Verifiable Credentialing**](docs/showcase/screenshots/05_desktop_assessment_arena.png)
+- 🌐 [**Distributed System Design & Chaos Engineering Sandbox**](docs/showcase/screenshots/06_desktop_architecture_sandbox.png)
+- 👔 [**B2B Enterprise Recruiter Talent Clearinghouse**](docs/showcase/screenshots/07_desktop_recruiter_clearinghouse.png)
+- 🤖 [**Autonomous AI Copilot & Voice/Text Clinical Mentor**](docs/showcase/screenshots/08_desktop_ai_copilot_mentor.png)
+- 🌟 [**Master Platform Hero Showcase**](docs/showcase/screenshots/platform_hero_showcase.png)
 
 ```
 blood-match-api/

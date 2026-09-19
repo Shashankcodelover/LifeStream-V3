@@ -23,7 +23,7 @@ const CANDIDATE_TALENT_POOL = [
     availableForHire: true,
     expectedSalary: '$340,000/yr',
     skills: ['Haversine Proximity', 'Massive Transfusion Protocol', 'Rh/Kell Compatibility', 'FAA Part 107'],
-    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+    avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="150" height="150" fill="%231a73e8" rx="75"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white">MC</text></svg>',
     bio: '12+ years directing Level-1 trauma resuscitations with zero cold-chain degradation. Pioneered drone-mediated blood dispatch protocols.'
   },
   {
@@ -41,7 +41,7 @@ const CANDIDATE_TALENT_POOL = [
     availableForHire: true,
     expectedSalary: '$210,000/yr',
     skills: ['Dynamic TFR Avoidance', 'ADS-B In/Out', 'Path Planning', 'PID Altitude Stabilization'],
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="150" height="150" fill="%2334a853" rx="75"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white">SC</text></svg>',
     bio: 'Lead flight software architect for high-speed eVTOL medical delivery corridors across urban Class-G airspace.'
   },
   {
@@ -59,7 +59,7 @@ const CANDIDATE_TALENT_POOL = [
     availableForHire: false,
     expectedSalary: '$285,000/yr',
     skills: ['Kell Antigens', 'Rh Phenotyping', 'Cross-matching', 'Cold-Chain IoT'],
-    avatar: 'https://images.unsplash.com/photo-1594824813681-36a568b209e5?w=150&auto=format&fit=crop&q=80',
+    avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="150" height="150" fill="%23ea4335" rx="75"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white">ER</text></svg>',
     bio: 'Specialist in rapid bedside antibody detection and mitigating delayed hemolytic transfusion reactions in poly-transfused trauma patients.'
   },
   {
@@ -77,7 +77,7 @@ const CANDIDATE_TALENT_POOL = [
     availableForHire: true,
     expectedSalary: '$165,000/yr',
     skills: ['MTP 1:1:1', 'Thermal Packaging', 'Emergency Airway', 'Rapid Infuser Operation'],
-    avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&auto=format&fit=crop&q=80',
+    avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="150" height="150" fill="%23fbbc04" rx="75"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white">DM</text></svg>',
     bio: '8 years of high-acuity rotorcraft and fixed-wing inter-facility critical transport with deep experience in airborne whole blood resuscitation.'
   },
   {
@@ -95,7 +95,7 @@ const CANDIDATE_TALENT_POOL = [
     availableForHire: true,
     expectedSalary: '$140,000/yr',
     skills: ['Phase-Change Mitigation', 'Telemetry Sensors', 'Micro-Peltier Regulators', 'AABB Storage Rules'],
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="150" height="150" fill="%239334ea" rx="75"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white">AP</text></svg>',
     bio: 'Engineered Phase-Change Material (PCM) thermal containers maintaining 1-6°C whole blood envelope under desert ambient conditions.'
   }
 ];

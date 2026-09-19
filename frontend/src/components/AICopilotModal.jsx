@@ -156,6 +156,8 @@ export function AICopilotModal({ isOpen, onClose }) {
 
             {/* Close Button */}
             <button
+              id="close-copilot-btn"
+              aria-label="Close Copilot"
               onClick={onClose}
               className="p-2 rounded-xl text-[#5f6368] hover:bg-[#f1f3f4] transition-colors"
             >
