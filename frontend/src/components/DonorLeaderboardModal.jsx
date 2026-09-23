@@ -66,9 +66,9 @@ export function DonorLeaderboardModal({ onClose, activeHospitalName = 'SF Genera
 
         {/* SMS Ping Alert Notification Card if triggered */}
         {pingMessage && (
-          <div className="mb-4 bg-purple-950/40 border border-purple-500/40 p-4 rounded-2xl animate-fade-in flex items-start justify-between gap-3">
+          <div className="mb-4 bg-blue-950/40 border border-blue-500/40 p-4 rounded-2xl animate-fade-in flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
                 <Phone className="w-4 h-4" />
               </div>
               <div>
@@ -149,7 +149,7 @@ export function DonorLeaderboardModal({ onClose, activeHospitalName = 'SF Genera
 
                     <button
                       onClick={() => handleSimulatePing(donor)}
-                      className="flex items-center gap-1.5 bg-slate-800 hover:bg-purple-600/30 text-slate-300 hover:text-purple-300 border border-slate-700 hover:border-purple-500/40 text-xs font-semibold px-3 py-2 rounded-xl transition-all"
+                      className="flex items-center gap-1.5 bg-slate-800 hover:bg-blue-600/30 text-slate-300 hover:text-blue-300 border border-slate-700 hover:border-blue-500/40 text-xs font-semibold px-3 py-2 rounded-xl transition-all"
                       title="Send Emergency Dispatch SMS Alert"
                     >
                       <Send className="w-3.5 h-3.5" />

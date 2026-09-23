@@ -129,7 +129,7 @@ export function AuthModal({ onClose, onAuthSuccess }) {
           </button>
           <button
             onClick={() => setTab('demo')}
-            className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${tab === 'demo' ? 'bg-purple-600 text-white shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'}`}
+            className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${tab === 'demo' ? 'bg-blue-600 text-white shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'}`}
           >
             <Zap className="w-3.5 h-3.5" />
             <span>1-Click Demo Logins</span>
@@ -204,11 +204,11 @@ export function AuthModal({ onClose, onAuthSuccess }) {
                 <div
                   key={acc.email}
                   onClick={() => handle1ClickDemo(acc)}
-                  className="bg-slate-50 border border-slate-200 hover:border-purple-300 hover:bg-purple-50/50 p-3.5 rounded-2xl cursor-pointer transition-all flex flex-col justify-between group shadow-sm"
+                  className="bg-slate-50 border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 p-3.5 rounded-2xl cursor-pointer transition-all flex flex-col justify-between group shadow-sm"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
+                      <span className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
                         {acc.title}
                       </span>
                       <span className="text-[9px] font-mono uppercase bg-white text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
@@ -219,7 +219,7 @@ export function AuthModal({ onClose, onAuthSuccess }) {
                     <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">{acc.description}</p>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-purple-600 font-bold">
+                  <div className="mt-3 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-blue-600 font-bold">
                     <span>1-Click Launch</span>
                     <Zap className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </div>

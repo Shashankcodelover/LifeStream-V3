@@ -258,7 +258,7 @@ export function AssessmentArenaView({ user }) {
                   onClick={() => toggleReviewMark(currentChallenge.id)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
                     markedForReview.has(currentChallenge.id)
-                      ? 'bg-[#f3e8fd] text-[#7e22ce] border-[#e9d5ff]'
+                      ? 'bg-[#f3e8fd] text-[#1d4ed8] border-[#e9d5ff]'
                       : 'bg-white text-[#5f6368] border-[#dadce0] hover:text-[#202124]'
                   }`}
                 >
@@ -381,7 +381,7 @@ export function AssessmentArenaView({ user }) {
                 <span>Answered</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-md bg-[#7e22ce]" />
+                <span className="w-3 h-3 rounded-md bg-[#1d4ed8]" />
                 <span>Marked for Review</span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -403,7 +403,7 @@ export function AssessmentArenaView({ user }) {
 
                 let bgClass = 'bg-[#f1f3f4] text-[#5f6368] border-[#dadce0]';
                 if (isCurrent) bgClass = 'bg-[#fbbc04] text-[#202124] border-[#f29900] font-bold ring-2 ring-[#fbbc04]/40';
-                else if (isMarked) bgClass = 'bg-[#f3e8fd] text-[#7e22ce] border-[#e9d5ff] font-bold';
+                else if (isMarked) bgClass = 'bg-[#f3e8fd] text-[#1d4ed8] border-[#e9d5ff] font-bold';
                 else if (isAnswered) bgClass = 'bg-[#e6f4ea] text-[#137333] border-[#ceead6] font-bold';
 
                 return (

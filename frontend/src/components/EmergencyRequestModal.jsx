@@ -108,7 +108,7 @@ export function EmergencyRequestModal({ onClose, hospitals = [], onDispatchMissi
                         if (onDispatchMission) onDispatchMission(donor.id, 'Autonomous Drone');
                         onClose();
                       }}
-                      className="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                      className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all"
                     >
                       <Navigation className="w-3.5 h-3.5" />
                       <span>Deploy Drone</span>

@@ -180,7 +180,7 @@ export function OrderTrackingModal({ onClose, activeDispatches = [] }) {
                           isDone
                             ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-md shadow-emerald-500/30'
                             : isCurrent
-                            ? 'bg-purple-600 border-purple-400 text-white animate-pulse'
+                            ? 'bg-blue-600 border-blue-400 text-white animate-pulse'
                             : 'bg-slate-900 border-slate-700 text-slate-500'
                         }`}
                       >
@@ -193,7 +193,7 @@ export function OrderTrackingModal({ onClose, activeDispatches = [] }) {
                             {step.title}
                           </h5>
                           {isCurrent && (
-                            <span className="text-[9px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded font-bold animate-pulse">
+                            <span className="text-[9px] font-mono bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1.5 py-0.2 rounded font-bold animate-pulse">
                               LIVE IN-FLIGHT
                             </span>
                           )}

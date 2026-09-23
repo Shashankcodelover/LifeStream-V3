@@ -431,7 +431,7 @@ Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
-            <Network className="w-4 h-4 text-purple-600" />
+            <Network className="w-4 h-4 text-blue-600" />
             <span>Healthcare Mesh & Relations ({relations.length})</span>
           </button>
 
@@ -1136,14 +1136,14 @@ Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock
               <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Network className="w-4 h-4 text-purple-600" />
+                    <Network className="w-4 h-4 text-blue-600" />
                     <h4 className="text-xs font-bold text-slate-900">Inter-Hospital Mutual Aid Mesh & Corridors</h4>
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">Define cross-facility triage, drone flight corridors, and pediatric contingency links</p>
                 </div>
                 <button
                   onClick={() => setShowAddRelation(!showAddRelation)}
-                  className="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                  className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Establish Mutual Aid Link</span>
@@ -1152,7 +1152,7 @@ Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock
 
               {/* Add Relation Form */}
               {showAddRelation && (
-                <form onSubmit={handleCreateRelation} className="bg-white border border-purple-300 p-4 rounded-2xl shadow-sm grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <form onSubmit={handleCreateRelation} className="bg-white border border-blue-300 p-4 rounded-2xl shadow-sm grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Source Medical Center</label>
                     <select
@@ -1212,7 +1212,7 @@ Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock
                     </button>
                     <button
                       type="submit"
-                      className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg transition-all shadow-sm"
+                      className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg transition-all shadow-sm"
                     >
                       Confirm & Establish Corridor
                     </button>
@@ -1235,7 +1235,7 @@ Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock
                       trauma_escalation: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', label: 'Trauma Escalation' },
                       pediatric_transfer: { bg: 'bg-sky-50', border: 'border-sky-200', text: 'text-sky-700', label: 'Pediatric Transfer' },
                       emergency_reserve: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', label: 'Emergency Reserve' },
-                      drone_corridor: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', label: 'Airspace Drone Corridor' },
+                      drone_corridor: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', label: 'Airspace Drone Corridor' },
                       surplus_mesh: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', label: 'Surplus Mesh' }
                     }[rel.relationType] || { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-700', label: rel.relationType };
 
@@ -1257,7 +1257,7 @@ Aria Walker,B-,3,critical,HOSP-04,+1 415-555-9033,Severe acute hemorrhagic shock
                               <span className="text-[10px] font-mono text-slate-500">{rel.fromHospitalId}</span>
                             </div>
 
-                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 shadow-inner">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-inner">
                               <Link2 className="w-4 h-4" />
                             </div>
 

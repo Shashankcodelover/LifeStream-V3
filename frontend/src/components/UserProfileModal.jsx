@@ -78,13 +78,13 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
         {/* Header Profile Summary */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-lg font-bold shadow-md shadow-purple-600/20">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-bold shadow-md shadow-blue-600/20">
               {user?.name?.charAt(0) || 'U'}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-bold text-slate-900">{user?.name}</h3>
-                <span className="text-[10px] font-mono font-bold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full uppercase">
+                <span className="text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full uppercase">
                   {user?.role}
                 </span>
                 {user?.bloodType && (
@@ -121,7 +121,7 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Full Legal Name</label>
               <input
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-purple-500 focus:bg-white"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
@@ -130,7 +130,7 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contact Phone</label>
               <input
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-purple-500 focus:bg-white"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
               />
@@ -159,7 +159,7 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Emergency Contact Person</label>
                 <input
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-purple-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-blue-500"
                   placeholder="e.g. Spouse / Parent (+1 415-555-0912)"
                   value={emergencyContact}
                   onChange={e => setEmergencyContact(e.target.value)}
@@ -169,7 +169,7 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
                 <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pre-Existing Medical Notes / Allergies</label>
                 <textarea
                   rows="2"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none resize-none focus:border-purple-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none resize-none focus:border-blue-500"
                   value={medicalNotes}
                   onChange={e => setMedicalNotes(e.target.value)}
                 />
@@ -180,7 +180,7 @@ export function UserProfileModal({ user, onClose, onLogout, onProfileUpdated }) 
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center justify-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-sm transition-all"
+            className="flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-sm transition-all"
           >
             <Save className="w-3.5 h-3.5" />
             <span>Save Profile Settings</span>
