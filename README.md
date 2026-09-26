@@ -1,39 +1,47 @@
-# LifeStream V3.1 — Smart Blood & Autonomous Emergency Dispatch Platform
+# LifeStream V3.1 — Emergency Blood Dispatch & Logistics Network
 
-LifeStream V3.1 is a cutting-edge "Uber for Blood" emergency logistics and dispatch platform designed for rapid medical response.
+LifeStream V3.1 is an autonomous emergency blood matching and cold-chain logistics platform connecting regional trauma centers with compatible donors and drone transport.
 
 ```
-blood-match-api/
-├── src/            Node.js + Express REST API (AI matching, telemetry simulation)
-└── frontend/       Vite + React 18, Tailwind CSS, Leaflet.js Radar Map
+LifeStream-V3/
+├── src/            Node.js + Express REST API (geospatial matching & IoT telemetry)
+└── frontend/       Vite + React 18, Tailwind CSS, Leaflet.js Radar Operations Grid
 ```
 
 ## Features
 
-- 🛰️ **Interactive Leaflet Radar Map**: Dark-mode geospatial map visualizing hospitals, donors, and active transport routes without external API keys.
-- 🚁 **Autonomous Drone & Transport Telemetry**: Simulates real-time 1.5s vector telemetry (GPS coordinates, vehicle speed, altitude, battery percentage).
-- 🌡️ **Cold-Chain IoT Monitoring**: Real-time blood temperature tracking (safe zone 2°C - 6°C) to ensure medical compliance during active transit.
-- 🧠 **AI Match Confidence Scoring**: Evaluates donor geospatial proximity (Haversine formula), 56-day medical donation cooldowns, and reliability ratings.
-- 🏥 **Hospital Inventory Monitoring**: Live multi-hospital blood bank stock level management per blood type.
-- 👤 **Donor Registration Engine**: Instant donor onboarding with auto-geolocation and verification status.
+- **Blood Donor Matching**: Evaluates and matches compatible blood donors using ABO/Rh matrix compatibility, geospatial proximity (Haversine formula), and 56-day donation cooldown eligibility.
+- **IoT Cold-Chain Telemetry**: Live blood transport temperature monitoring (enforcing the 2°C to 6°C medical safety corridor) with altitude, battery, and ETA tracking.
+- **Trauma Center Inventory**: Real-time hospital blood bank reserves and critical shortage alerts across regional medical centers.
+- **Autonomous Dispatch**: Protocol authorization for autonomous drones and emergency medical transport carriers.
+- **Volunteer Donor Registration**: Secure donor onboarding with emergency dispatch mobile alerts and verified health compliance.
 
 ## Getting Started
 
 ### 1. Backend Server
 ```bash
-cd blood-match-api
 npm install
-npm start          # Running on http://localhost:3000
+npm start          # Runs on http://localhost:3000
 ```
 
 ### 2. Frontend Development Server
 ```bash
-cd blood-match-api/frontend
+cd frontend
 npm install
-npm run dev        # Running on http://localhost:5174
+npm run dev        # Runs on http://localhost:5173
 ```
 
-## Architecture Highlights
-- **Geospatial Matching Engine**: Evaluates donor distance using the Haversine formula and enforces 56-day donation eligibility unless marked as Critical Emergency.
-- **Vite + Tailwind Frontend**: Componentized React architecture with glassmorphism UI, pulsing radar markers, and live telemetry overlays.
-- **RESTful Endpoints**: `/api/donors/matches/:bloodType`, `/api/dispatch`, `/api/dispatch/track/:id`, `/api/hospitals`.
+### 3. Production Build
+```bash
+cd frontend
+npm run build      # Outputs to frontend/dist
+```
+
+## API Endpoints
+
+- `GET /api/donors/matches/:bloodType?urgency=critical` — Evaluates compatible donors for recipient need.
+- `POST /api/donors` — Registers a new volunteer donor into the dispatch network.
+- `POST /api/dispatch` — Authorizes and launches emergency blood transport.
+- `GET /api/dispatch/track/:id` — Streams live vector position and cold-chain temperature telemetry.
+- `GET /api/hospitals` — Returns hospital blood bank reserves and inventory levels.
+- `GET /health` — Service health check endpoint.

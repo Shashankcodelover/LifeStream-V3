@@ -5,6 +5,7 @@ export function RadarMap({ hospitalCoord, matches, activeDispatch }) {
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const polylineRef = useRef(null);
+  const vehicleMarkerRef = useRef(null);
 
   useEffect(() => {
     if (mapInstanceRef.current) return;
@@ -54,13 +55,13 @@ export function RadarMap({ hospitalCoord, matches, activeDispatch }) {
       const icon = L.divIcon({ className: iconClass, iconSize: size });
       const marker = L.marker([d.lat, d.lng], { icon })
         .addTo(map)
-        .bindTooltip(`<b>${d.name} (${d.bloodType})</b><br>Match Score: <span style="color:#10b981;font-weight:bold">${d.aiScore}%</span>`, { direction: 'top' });
+        .bindTooltip(`<b>${d.name} (${d.bloodType})</b><br>Match Score: <span style="color:#38bdf8;font-weight:bold">${d.aiScore}%</span>`, { direction: 'top' });
 
       markersRef.current[d.id] = marker;
     });
   }, [matches, activeDispatch]);
 
-  // Update active dispatch vector polyline
+  // Update active dispatch vector polyline and moving vehicle/drone marker
   useEffect(() => {
     const map = mapInstanceRef.current;
     const L = window.L;
@@ -71,6 +72,11 @@ export function RadarMap({ hospitalCoord, matches, activeDispatch }) {
       polylineRef.current = null;
     }
 
+    if (vehicleMarkerRef.current) {
+      map.removeLayer(vehicleMarkerRef.current);
+      vehicleMarkerRef.current = null;
+    }
+
     if (activeDispatch) {
       const coords = [
         [activeDispatch.currentLat, activeDispatch.currentLng],
@@ -78,16 +84,22 @@ export function RadarMap({ hospitalCoord, matches, activeDispatch }) {
       ];
 
       polylineRef.current = L.polyline(coords, {
-        color: '#10b981',
+        color: '#0284c7',
         weight: 3,
         dashArray: '8, 8',
         opacity: 0.85
       }).addTo(map);
+
+      // Render active drone/transport icon on current position
+      const vehicleIcon = L.divIcon({ className: 'drone-icon', iconSize: [22, 22] });
+      vehicleMarkerRef.current = L.marker([activeDispatch.currentLat, activeDispatch.currentLng], { icon: vehicleIcon })
+        .addTo(map)
+        .bindTooltip(`<b>${activeDispatch.transportType}</b><br>ETA: <span style="color:#38bdf8;font-weight:bold">${activeDispatch.etaMinutes} min</span>`, { direction: 'top' });
 
       // Pan smoothly to dispatch location
       map.panTo([activeDispatch.currentLat, activeDispatch.currentLng], { animate: true });
     }
   }, [activeDispatch]);
 
-  return <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" />;
+  return <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" aria-label="Interactive emergency blood logistics radar map" />;
 }

@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 
@@ -21,8 +23,28 @@ app.get('/api/track/:dispatchId', (req, res) => {
   res.redirect(`/api/dispatch/track/${req.params.dispatchId}`);
 });
 
-app.get('/health', (req, res) => res.status(200).json({ status: 'LifeStream V3.1 Active', service: 'blood-match-api' }));
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'LifeStream V3.1 Active', service: 'blood-match-api' });
+});
+
+// Serve frontend build if dist directory exists
+const distPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
+
+// 404 catch-all for unknown API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'Not Found', message: `No API endpoint at ${req.originalUrl}` });
+});
+
+// Catch-all for SPA client routing if dist exists
+if (fs.existsSync(distPath)) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
-  console.log(`🚀 LifeStream V3.1 (Smart Blood Network) API running on http://localhost:${PORT}`);
+  console.log(`[LifeStream V3.1] API service running on port ${PORT}`);
 });

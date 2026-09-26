@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="crimsonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Grid lines -->
+  <g stroke="#334155" stroke-width="0.75" opacity="0.25">
+    <line x1="100" y1="0" x2="100" y2="630"/>
+    <line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="500" y1="0" x2="500" y2="630"/>
+    <line x1="700" y1="0" x2="700" y2="630"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+    <line x1="1100" y1="0" x2="1100" y2="630"/>
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="250" x2="1200" y2="250"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="550" x2="1200" y2="550"/>
+  </g>
+
+  <!-- Network Radar Circles -->
+  <circle cx="950" cy="315" r="240" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.15"/>
+  <circle cx="950" cy="315" r="160" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.25"/>
+  <circle cx="950" cy="315" r="80" fill="none" stroke="#ef4444" stroke-width="2" opacity="0.4"/>
+  <circle cx="950" cy="315" r="10" fill="#ef4444"/>
+
+  <!-- Route vector -->
+  <path d="M720 420 L950 315" stroke="#38bdf8" stroke-width="3" stroke-dasharray="8 8" opacity="0.8"/>
+  <circle cx="720" cy="420" r="8" fill="#38bdf8"/>
+
+  <!-- Logo Mark -->
+  <rect x="90" y="100" width="76" height="76" rx="20" fill="url(#crimsonGrad)"/>
+  <!-- Cross in Heart/Drop -->
+  <path d="M128 118c-4 0-7 3-9.5 7.5C115 130 110 140 110 148c0 10.5 8 18 18 18s18-7.5 18-18c0-8-5-18-8.5-22.5-2.5-4.5-5.5-7.5-9.5-7.5z" fill="#ffffff"/>
+  <path d="M123 146h10M128 141v10" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Main Headline -->
+  <text x="185" y="145" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="800" fill="#ffffff" letter-spacing="-1">LifeStream</text>
+  <rect x="420" y="117" width="95" height="32" rx="16" fill="rgba(239, 68, 68, 0.2)" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="440" y="138" font-family="monospace" font-size="14" font-weight="700" fill="#f87171">V3.1 LIVE</text>
+
+  <!-- Tagline -->
+  <text x="90" y="240" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="800" fill="#ffffff" letter-spacing="-1.5">
+    Autonomous Emergency
+  </text>
+  <text x="90" y="305" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="800" fill="#ef4444" letter-spacing="-1.5">
+    Blood Dispatch Network
+  </text>
+
+  <!-- Description -->
+  <text x="90" y="370" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400" fill="#94a3b8">
+    Geospatial Donor Matching · Cold-Chain IoT Telemetry (2°C–6°C) · Autonomous Drone Transport
+  </text>
+
+  <!-- Feature Pills -->
+  <g transform="translate(90, 440)">
+    <rect x="0" y="0" width="210" height="48" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <text x="20" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="600" fill="#e2e8f0">Blood Compatibility</text>
+
+    <rect x="230" y="0" width="220" height="48" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <text x="250" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="600" fill="#e2e8f0">IoT Cold-Chain Safe</text>
+
+    <rect x="470" y="0" width="220" height="48" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <text x="490" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="600" fill="#e2e8f0">Trauma Bank Reserves</text>
+  </g>
+
+  <!-- Bottom Brand Footnote -->
+  <text x="90" y="560" font-family="monospace" font-size="14" fill="#64748b">
+    San Francisco Trauma Logistics Grid · Regional Emergency Operations Hub
+  </text>
+</svg>

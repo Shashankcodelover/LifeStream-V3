@@ -1,5 +1,8 @@
 node_modules/
 db.json
 dist/
-.env
+.env*
+*.env
+.env.local
 .DS_Store
+.vercel
