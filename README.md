@@ -45,3 +45,6 @@ npm run build      # Outputs to frontend/dist
 - `GET /api/dispatch/track/:id` — Streams live vector position and cold-chain temperature telemetry.
 - `GET /api/hospitals` — Returns hospital blood bank reserves and inventory levels.
 - `GET /health` — Service health check endpoint.
+
+<!-- QA visual polish applied -->
+
