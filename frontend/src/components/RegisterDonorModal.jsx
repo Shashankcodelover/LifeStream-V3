@@ -94,7 +94,7 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
         </button>
 
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-500">
             <UserPlus className="w-5 h-5" />
           </div>
           <div>
@@ -106,8 +106,8 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
         </div>
 
         {errorMsg && (
-          <div className="mb-4 bg-red-500/15 border border-red-500/30 p-2.5 rounded-xl flex items-center gap-2 text-xs text-red-300">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+          <div className="mb-4 bg-blue-500/15 border border-blue-500/30 p-2.5 rounded-xl flex items-center gap-2 text-xs text-blue-300">
+            <AlertCircle className="w-4 h-4 shrink-0 text-blue-400" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -124,11 +124,11 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label htmlFor="donor-fullname" className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
-                Full Legal Name <span className="text-red-400">*</span>
+                Full Legal Name <span className="text-blue-400">*</span>
               </label>
               <input
                 id="donor-fullname"
-                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-500 outline-none focus:border-red-500/50 transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-500 outline-none focus:border-blue-500/50 transition-colors"
                 placeholder="e.g. Marcus Vance"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -138,11 +138,11 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
 
             <div>
               <label htmlFor="donor-bloodtype" className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
-                Blood Group (ABO/Rh) <span className="text-red-400">*</span>
+                Blood Group (ABO/Rh) <span className="text-blue-400">*</span>
               </label>
               <select
                 id="donor-bloodtype"
-                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-red-500/50 transition-colors font-mono"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500/50 transition-colors font-mono"
                 value={form.bloodType}
                 onChange={(e) => setForm((f) => ({ ...f, bloodType: e.target.value }))}
               >
@@ -156,12 +156,12 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
 
             <div>
               <label htmlFor="donor-phone" className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
-                Emergency Dispatch Mobile Number <span className="text-red-400">*</span>
+                Emergency Dispatch Mobile Number <span className="text-blue-400">*</span>
               </label>
               <input
                 id="donor-phone"
                 type="tel"
-                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-500 outline-none focus:border-red-500/50 transition-colors font-mono"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-500 outline-none focus:border-blue-500/50 transition-colors font-mono"
                 placeholder="+1 415-555-0199"
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
@@ -179,7 +179,7 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-slate-300 bg-white text-red-600 focus:ring-red-500/20"
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 bg-white text-blue-600 focus:ring-red-500/20"
                 />
                 <span className="leading-tight text-slate-500">
                   I confirm I am at least 17 years old, weigh &ge;110 lbs, and consent to emergency logistics dispatch under the{' '}
@@ -189,7 +189,7 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
                       e.preventDefault();
                       onOpenLegal();
                     }}
-                    className="text-red-400 hover:underline underline-offset-2 font-medium"
+                    className="text-blue-400 hover:underline underline-offset-2 font-medium"
                   >
                     Privacy Policy &amp; Terms
                   </button>.
@@ -201,7 +201,7 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
               <button
                 type="submit"
                 disabled={loading || !agreed}
-                className="w-full bg-red-600 hover:bg-red-500 text-slate-900 font-bold py-3 rounded-xl text-sm shadow-lg shadow-red-600/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99]"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-slate-900 font-bold py-3 rounded-xl text-sm shadow-lg shadow-blue-600/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99]"
               >
                 {loading ? 'Verifying Coordinates...' : 'Register as Volunteer Donor'}
               </button>

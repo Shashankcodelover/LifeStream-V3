@@ -64,7 +64,7 @@ export function HospitalInventoryModal({ onClose }) {
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-500">
             <Hospital className="w-5 h-5" />
           </div>
           <div>
@@ -87,14 +87,14 @@ export function HospitalInventoryModal({ onClose }) {
               placeholder="Filter by facility name or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-500/50 transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500/50 transition-colors"
             />
           </div>
           <button
             onClick={() => setFilterShortageOnly(!filterShortageOnly)}
             className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
               filterShortageOnly
-                ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-sm shadow-red-900/20'
+                ? 'bg-blue-500/20 text-blue-400 border-blue-500/40 shadow-sm shadow-blue-900/20'
                 : 'bg-white text-slate-500 border-slate-200 hover:text-slate-800'
             }`}
           >
@@ -120,7 +120,7 @@ export function HospitalInventoryModal({ onClose }) {
                     </div>
                     <div className="flex items-center gap-2">
                       {criticalUnits.length > 0 && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/25 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2 py-0.5 rounded-full flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3" />
                           {criticalUnits.length} Low Types
                         </span>
@@ -144,7 +144,7 @@ export function HospitalInventoryModal({ onClose }) {
                           key={type}
                           className={`p-2 rounded-lg text-center border font-mono transition-colors ${
                             isLow
-                              ? 'bg-red-500/10 border-red-500/30 text-red-400 font-bold'
+                              ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 font-bold'
                               : 'bg-white/60 border-slate-200 text-slate-700'
                           }`}
                         >

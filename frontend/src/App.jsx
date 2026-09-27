@@ -148,8 +148,8 @@ export default function App() {
 
       {/* Error / Alert Toast */}
       {errorToast && (
-        <div className="fixed top-20 right-6 z-50 bg-red-950/90 border border-red-500/50 text-red-200 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs backdrop-blur-md animate-fade-in">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+        <div className="fixed top-20 right-6 z-50 bg-blue-950/90 border border-blue-500/50 text-blue-200 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs backdrop-blur-md animate-fade-in">
+          <AlertCircle className="w-4 h-4 text-blue-400 shrink-0" />
           <span>{errorToast}</span>
         </div>
       )}

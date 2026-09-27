@@ -27,7 +27,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-500">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -52,7 +52,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
             onClick={() => setActiveTab('privacy')}
             className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'privacy'
-                ? 'border-red-500 text-red-400 font-bold'
+                ? 'border-blue-500 text-blue-400 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -63,7 +63,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
             onClick={() => setActiveTab('terms')}
             className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'terms'
-                ? 'border-red-500 text-red-400 font-bold'
+                ? 'border-blue-500 text-blue-400 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -76,8 +76,8 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
         <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs text-slate-700 custom-scrollbar leading-relaxed">
           {activeTab === 'privacy' ? (
             <div className="space-y-4">
-              <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-300 flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+              <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl text-blue-300 flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
                 <p>
                   LifeStream processes confidential health data solely for life-critical blood matching and emergency transport logistics under international emergency care exemptions.
                 </p>
@@ -85,7 +85,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
 
               <div>
                 <h3 className="font-bold text-slate-900 text-sm mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-red-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
                   1. Information We Collect
                 </h3>
                 <p className="text-slate-500">
@@ -95,7 +95,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
 
               <div>
                 <h3 className="font-bold text-slate-900 text-sm mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-red-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
                   2. Purpose & Use of Data
                 </h3>
                 <p className="text-slate-500">
@@ -105,7 +105,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
 
               <div>
                 <h3 className="font-bold text-slate-900 text-sm mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-red-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
                   3. Health Privacy & Non-Commercial Guarantee
                 </h3>
                 <p className="text-slate-500">
@@ -115,7 +115,7 @@ export function LegalModal({ initialTab = 'privacy', onClose }) {
 
               <div>
                 <h3 className="font-bold text-slate-900 text-sm mb-1.5 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-red-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
                   4. Donor Rights & Data Removal
                 </h3>
                 <p className="text-slate-500">

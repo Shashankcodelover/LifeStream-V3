@@ -66,8 +66,8 @@ export function MissionModal({ mission, onClose }) {
 
           <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
             <span className="text-slate-500">Donor Unit</span>
-            <span className="font-bold text-red-400 flex items-center gap-1.5">
-              <span className="bg-red-500/10 text-red-400 font-mono px-2 py-0.5 rounded border border-red-500/20">
+            <span className="font-bold text-blue-400 flex items-center gap-1.5">
+              <span className="bg-blue-500/10 text-blue-400 font-mono px-2 py-0.5 rounded border border-blue-500/20">
                 {mission.donorBloodType}
               </span>
               from {mission.donorName}
@@ -93,7 +93,7 @@ export function MissionModal({ mission, onClose }) {
 
         <button
           onClick={onClose}
-          className="w-full bg-red-600 hover:bg-red-500 text-slate-900 font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-red-600/30 transition-all active:scale-[0.98]"
+          className="w-full bg-blue-600 hover:bg-blue-500 text-slate-900 font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-blue-600/30 transition-all active:scale-[0.98]"
         >
           Acknowledge & Clear Mission Log
         </button>

@@ -10,13 +10,13 @@ export function Navbar({ onOpenInventory, onOpenRegisterDonor, onOpenLegal, acti
         className="flex items-center gap-3 text-left focus:outline-none group"
         title="LifeStream Emergency Network — Click to reset view"
       >
-        <div className="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-600/30 group-hover:bg-red-500 transition-colors">
+        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30 group-hover:bg-blue-500 transition-colors">
           <Activity className="w-5 h-5 text-slate-900 animate-pulse" />
         </div>
         <div>
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-base md:text-lg text-slate-900 tracking-tight">LifeStream</span>
-            <span className="text-[10px] font-mono font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full">
               V3.1
             </span>
           </div>
@@ -53,14 +53,14 @@ export function Navbar({ onOpenInventory, onOpenRegisterDonor, onOpenLegal, acti
           onClick={onOpenInventory}
           className="flex items-center gap-2 bg-slate-100 hover:bg-slate-700 text-slate-800 border border-slate-300/80 px-3 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
         >
-          <Hospital className="w-4 h-4 text-red-400" />
+          <Hospital className="w-4 h-4 text-blue-400" />
           <span className="hidden sm:inline">Trauma Reserves</span>
           <span className="sm:hidden">Reserves</span>
         </button>
 
         <button
           onClick={onOpenRegisterDonor}
-          className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-slate-900 px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-red-600/30 transition-all active:scale-95"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-slate-900 px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 transition-all active:scale-95"
         >
           <UserPlus className="w-4 h-4" />
           <span className="hidden sm:inline">Register Donor</span>
