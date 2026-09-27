@@ -26,7 +26,7 @@ export function RadarMap({ hospitalCoord, matches, activeDispatch }) {
     const hospitalIcon = L.divIcon({ className: 'hospital-icon', iconSize: [26, 26] });
     L.marker(hospitalCoord, { icon: hospitalIcon })
       .addTo(map)
-      .bindTooltip('<b style="color:#ef4444">SF General Emergency Hospital</b><br><span style="font-size:11px;color:#94a3b8">Trauma Center Dispatch Hub</span>', { permanent: false });
+      .bindTooltip('<b style="color:#0f172a">SF General Emergency Hospital</b><br><span style="font-size:11px;color:#94a3b8">Trauma Center Dispatch Hub</span>', { permanent: false });
 
     return () => {
       if (mapInstanceRef.current) {

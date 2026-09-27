@@ -30,7 +30,7 @@ export default function App() {
   // Fetch matched donors from API
   const fetchMatches = useCallback(async () => {
     try {
-      const res = await fetch(`/api/donors/matches/${recipientType}?urgency=${urgency}`);
+      const res = await fetch(`/api/donors/matches/${encodeURIComponent(recipientType)}?urgency=${encodeURIComponent(urgency)}`);
       if (!res.ok) throw new Error('Failed to retrieve donor coordinates');
       const data = await res.json();
       if (data.hospital) setHospital(data.hospital);

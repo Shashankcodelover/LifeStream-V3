@@ -179,7 +179,7 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-slate-300 bg-white text-blue-600 focus:ring-red-500/20"
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 bg-white text-blue-600 focus:ring-blue-500/20"
                 />
                 <span className="leading-tight text-slate-500">
                   I confirm I am at least 17 years old, weigh &ge;110 lbs, and consent to emergency logistics dispatch under the{' '}
