@@ -113,7 +113,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#0b0f19] text-slate-100 font-sans">
+    <div className="relative w-full h-screen overflow-hidden bg-slate-50 text-slate-900 font-sans">
       {/* Navbar Header */}
       <Navbar
         onOpenInventory={() => setShowInventory(true)}
@@ -155,7 +155,7 @@ export default function App() {
       )}
 
       {/* Bottom Compliance & Status Footer Dock */}
-      <footer className="fixed bottom-0 right-0 z-10 px-4 py-1.5 hidden md:flex items-center gap-3 bg-slate-950/80 backdrop-blur-sm border-t border-l border-slate-800 rounded-tl-xl text-[11px] text-slate-400">
+      <footer className="fixed bottom-0 right-0 z-10 px-4 py-1.5 hidden md:flex items-center gap-3 bg-white/80 backdrop-blur-sm border-t border-l border-slate-200 rounded-tl-xl text-[11px] text-slate-600">
         <span>&copy; {new Date().getFullYear()} LifeStream V3.1</span>
         <span>•</span>
         <button onClick={() => handleOpenLegal('privacy')} className="hover:text-slate-200 underline-offset-2 hover:underline">
@@ -166,7 +166,7 @@ export default function App() {
           Terms of Service
         </button>
         <span>•</span>
-        <span className="flex items-center gap-1 text-slate-400">
+        <span className="flex items-center gap-1 text-slate-600">
           <Shield className="w-3 h-3 text-cyan-400" />
           HIPAA &amp; FAA Part 107 Compliant
         </span>

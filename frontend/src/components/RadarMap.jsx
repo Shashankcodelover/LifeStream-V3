@@ -17,9 +17,8 @@ export function RadarMap({ hospitalCoord, matches, activeDispatch }) {
     mapInstanceRef.current = map;
 
     // Dark Leaflet tiles (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
+    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      attribution: '&copy; Google Maps',
       maxZoom: 19
     }).addTo(map);
 

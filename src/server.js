@@ -45,6 +45,8 @@ if (fs.existsSync(distPath)) {
   });
 }
 
+module.exports = app;
+
 app.listen(PORT, () => {
   console.log(`[LifeStream V3.1] API service running on port ${PORT}`);
 });

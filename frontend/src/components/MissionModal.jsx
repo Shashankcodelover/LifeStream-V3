@@ -16,19 +16,19 @@ export function MissionModal({ mission, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/85 backdrop-blur-md animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="mission-success-title"
     >
       <div
-        className="w-full max-w-md glass-panel p-6 rounded-2xl shadow-2xl border border-slate-700/80 relative"
+        className="w-full max-w-md glass-panel p-6 rounded-2xl shadow-2xl border border-slate-300/80 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           aria-label="Close summary"
         >
           <X className="w-5 h-5" />
@@ -41,31 +41,31 @@ export function MissionModal({ mission, onClose }) {
           <span className="text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
             Mission Delivered & Verified
           </span>
-          <h2 id="mission-success-title" className="text-lg font-bold text-white mt-2">
+          <h2 id="mission-success-title" className="text-lg font-bold text-slate-900 mt-2">
             Emergency Blood Dispatch Complete
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Life-critical blood unit successfully transferred to receiving trauma center.
           </p>
         </div>
 
         {/* Mission Details Card */}
-        <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-3 font-sans text-xs mb-5">
-          <div className="flex justify-between items-center pb-2.5 border-b border-slate-800/80">
-            <span className="text-slate-400">Dispatch Reference</span>
-            <span className="font-mono font-bold text-slate-200">{mission.id}</span>
+        <div className="bg-white/60 p-4 rounded-xl border border-slate-200 space-y-3 font-sans text-xs mb-5">
+          <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
+            <span className="text-slate-500">Dispatch Reference</span>
+            <span className="font-mono font-bold text-slate-800">{mission.id}</span>
           </div>
 
-          <div className="flex justify-between items-center pb-2.5 border-b border-slate-800/80">
-            <span className="text-slate-400">Carrier / Transport</span>
-            <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+          <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
+            <span className="text-slate-500">Carrier / Transport</span>
+            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
               <Navigation className="w-3.5 h-3.5 text-cyan-400" />
               {mission.transportType}
             </span>
           </div>
 
-          <div className="flex justify-between items-center pb-2.5 border-b border-slate-800/80">
-            <span className="text-slate-400">Donor Unit</span>
+          <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
+            <span className="text-slate-500">Donor Unit</span>
             <span className="font-bold text-red-400 flex items-center gap-1.5">
               <span className="bg-red-500/10 text-red-400 font-mono px-2 py-0.5 rounded border border-red-500/20">
                 {mission.donorBloodType}
@@ -74,13 +74,13 @@ export function MissionModal({ mission, onClose }) {
             </span>
           </div>
 
-          <div className="flex justify-between items-center pb-2.5 border-b border-slate-800/80">
-            <span className="text-slate-400">Destination Center</span>
-            <span className="font-semibold text-slate-200">{mission.hospitalName}</span>
+          <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
+            <span className="text-slate-500">Destination Center</span>
+            <span className="font-semibold text-slate-800">{mission.hospitalName}</span>
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-slate-400 flex items-center gap-1">
+            <span className="text-slate-500 flex items-center gap-1">
               <Thermometer className="w-3.5 h-3.5 text-cyan-400" />
               Cold-Chain Compliance
             </span>
@@ -93,7 +93,7 @@ export function MissionModal({ mission, onClose }) {
 
         <button
           onClick={onClose}
-          className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-red-600/30 transition-all active:scale-[0.98]"
+          className="w-full bg-red-600 hover:bg-red-500 text-slate-900 font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-red-600/30 transition-all active:scale-[0.98]"
         >
           Acknowledge & Clear Mission Log
         </button>
