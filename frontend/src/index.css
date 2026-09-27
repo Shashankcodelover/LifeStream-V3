@@ -22,10 +22,10 @@ body {
 
 /* Emergency Hospital Marker */
 .hospital-icon {
-  background: #dc2626;
+  background: #334155;
   border-radius: 50%;
   border: 3px solid #ffffff;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+  box-shadow: 0 0 20px rgba(51, 65, 85, 0.8);
   animation: pulse-hospital 2s infinite;
 }
 
@@ -55,9 +55,9 @@ body {
 }
 
 @keyframes pulse-hospital {
-  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-  70% { box-shadow: 0 0 0 22px rgba(220, 38, 38, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(51, 65, 85, 0.7); }
+  70% { box-shadow: 0 0 0 22px rgba(51, 65, 85, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(51, 65, 85, 0); }
 }
 
 @keyframes pulse-active {
