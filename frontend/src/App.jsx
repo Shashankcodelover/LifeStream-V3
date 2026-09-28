@@ -8,10 +8,12 @@ import { RegisterDonorModal } from './components/RegisterDonorModal';
 import { LegalModal } from './components/LegalModal';
 import { MissionModal } from './components/MissionModal';
 import { AlertCircle, Shield } from 'lucide-react';
+import { LandingPage } from './LandingPage';
 
 const DEFAULT_HOSPITAL = { id: 'HOSP-01', name: 'SF General Emergency Hospital', lat: 37.7749, lng: -122.4194 };
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [recipientType, setRecipientType] = useState('O-');
   const [urgency, setUrgency] = useState('critical');
   const [hospital, setHospital] = useState(DEFAULT_HOSPITAL);
@@ -111,6 +113,10 @@ export default function App() {
     setUrgency('critical');
     fetchMatches();
   };
+
+  if (showLanding) {
+    return <LandingPage onDemo={() => setShowLanding(false)} />;
+  }
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-slate-50 text-slate-900 font-sans">
