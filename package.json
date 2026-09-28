@@ -4,7 +4,7 @@
   "description": "LifeStream Enterprise V4.0 - Smart Blood & Emergency Logistics Platform",
   "main": "src/server.js",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build && node -e \"const fs=require('fs'); if(!fs.existsSync('../dist')) fs.mkdirSync('../dist'); fs.cpSync('dist', '../dist', {recursive: true});\"",
+    "build": "cd frontend && npm install --legacy-peer-deps && npm run build && node -e \"const fs=require('fs'); if(!fs.existsSync('../dist')) fs.mkdirSync('../dist'); fs.cpSync('dist', '../dist', {recursive: true});\"",
     "start": "node src/server.js",
     "dev": "node src/server.js",
     "dev:backend": "node src/server.js",

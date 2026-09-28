@@ -20,7 +20,8 @@ export function DispatchSidebar({
   onDispatch,
   onOpenInterHospital,
   onOpenEmergencyRequest,
-  onOpenMatrix
+  onOpenMatrix,
+  onOpenRegisterDonor
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const currentHospital = hospitals.find(h => h.id === selectedHospitalId) || hospitals[0];
@@ -232,6 +233,17 @@ export function DispatchSidebar({
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Volunteer Donor Quick Registration Footer */}
+          <div className="p-3 bg-[#f8fafd] border-t border-[#dadce0] flex items-center justify-between">
+            <span className="text-[11px] text-[#5f6368]">Want to donate?</span>
+            <button
+              onClick={onOpenRegisterDonor}
+              className="text-[11px] font-bold text-[#1a73e8] hover:underline"
+            >
+              + Register as Donor
+            </button>
           </div>
         </aside>
       )}

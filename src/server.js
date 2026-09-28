@@ -62,6 +62,10 @@ app.get('*', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 LifeStream Enterprise V5.0 Platform running 24/7 on port ${PORT}`);
-});
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 LifeStream Enterprise V5.0 Platform running 24/7 on port ${PORT}`);
+  });
+}

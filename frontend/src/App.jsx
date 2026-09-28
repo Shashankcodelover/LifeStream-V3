@@ -287,6 +287,7 @@ export default function App() {
         onOpenEmergencyRequest={() => setShowEmergencyRequest(true)}
         onOpenAdmin={() => setShowAdminModal(true)}
         onOpenDonorPass={() => setShowDonorPass(true)}
+        onOpenRegisterDonor={() => setShowRegisterDonor(true)}
         onToggleSound={handleSoundToggle}
         soundOn={soundOn}
         activeDispatchCount={activeInFlightCount}
@@ -322,6 +323,7 @@ export default function App() {
             onOpenInterHospital={() => setShowInterHospital(true)}
             onOpenEmergencyRequest={() => setShowEmergencyRequest(true)}
             onOpenMatrix={() => setActiveTab('clinical')}
+            onOpenRegisterDonor={() => setShowRegisterDonor(true)}
           />
 
           <TelemetryOverlay

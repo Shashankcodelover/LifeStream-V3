@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Activity, Radio, Siren, Droplet, Trophy, Package,
   Compass, MapPin, Volume2, VolumeX, LogIn, User, Hospital, ShieldAlert,
-  ChevronDown, HeartPulse, Sparkles, TrendingUp, QrCode, Layers, Briefcase
+  ChevronDown, HeartPulse, Sparkles, TrendingUp, QrCode, Layers, Briefcase, UserPlus
 } from 'lucide-react';
 
 export function Navbar({
@@ -14,6 +14,7 @@ export function Navbar({
   onOpenEmergencyRequest,
   onOpenAdmin,
   onOpenDonorPass,
+  onOpenRegisterDonor,
   onToggleSound,
   soundOn = true,
   activeDispatchCount = 0,
@@ -218,6 +219,17 @@ export function Navbar({
         >
           <MapPin className={`w-3.5 h-3.5 ${isTrackingUserLocation ? 'text-[#1a73e8]' : 'text-[#5f6368]'}`} />
           <span className="hidden sm:inline">{isTrackingUserLocation ? 'GPS Locked' : 'Locate Me'}</span>
+        </button>
+
+        {/* Register Blood Donor Button */}
+        <button
+          onClick={onOpenRegisterDonor}
+          title="Register as an emergency blood donor"
+          className="flex items-center gap-1.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm hover:shadow-md transition-all active:scale-95"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Register Donor</span>
+          <span className="sm:hidden">Donor</span>
         </button>
 
         {/* Google Red STAT Emergency Button */}
