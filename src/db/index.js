@@ -4,7 +4,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '../../db.json');
+const IS_VERCEL = process.env.VERCEL === '1';
+const DB_PATH = IS_VERCEL ? path.join('/tmp', 'db.json') : path.join(__dirname, '../../db.json');
 
 const INITIAL_DATA = {
   hospitals: [
@@ -46,7 +47,11 @@ function readDB() {
 }
 
 function writeDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.warn(`[DB WARNING] Failed to write to ${DB_PATH}:`, err.message);
+  }
 }
 
 module.exports = { readDB, writeDB };
