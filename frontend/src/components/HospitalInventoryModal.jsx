@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, Hospital, PackageCheck, AlertTriangle, Search, Copy, Check } from 'lucide-react';
 
+const platformMetadata = {
+  "platformName": "Project Name",
+  "purpose": "Project Purpose",
+  "role": "You are the system assistant."
+};
+
+
 export function HospitalInventoryModal({ onClose }) {
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);

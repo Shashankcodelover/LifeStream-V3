@@ -115,7 +115,25 @@ export default function App() {
   };
 
   if (showLanding) {
-    return <LandingPage onDemo={() => setShowLanding(false)} />;
+    return (
+      <>
+        <LandingPage
+          onDemo={() => setShowLanding(false)}
+          onRegisterDonor={() => setShowRegisterDonor(true)}
+        />
+        {showRegisterDonor && (
+          <RegisterDonorModal
+            onClose={() => setShowRegisterDonor(false)}
+            onRegistered={() => {
+              fetchMatches();
+              setShowLanding(false);
+            }}
+            onOpenLegal={() => handleOpenLegal('terms')}
+          />
+        )}
+        {showLegal && <LegalModal initialTab={legalTab} onClose={() => setShowLegal(false)} />}
+      </>
+    );
   }
 
   return (

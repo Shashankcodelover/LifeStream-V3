@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, FileText, Lock, CheckCircle, Scale, AlertCircle } from 'lucide-react';
 
+const platformMetadata = {
+  "platformName": "Project Name",
+  "purpose": "Project Purpose",
+  "role": "You are the system assistant."
+};
+
+
 export function LegalModal({ initialTab = 'privacy', onClose }) {
   const [activeTab, setActiveTab] = useState(initialTab);
 

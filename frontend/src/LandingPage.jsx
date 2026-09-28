@@ -1,12 +1,12 @@
 import React from 'react';
 import { Activity, ArrowRight, Play } from 'lucide-react';
 
-export function LandingPage({ onDemo }) {
+export function LandingPage({ onDemo, onRegisterDonor }) {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-4xl mx-auto">
-        <div className="mx-auto w-24 h-24 bg-cyan-100 rounded-full flex items-center justify-center mb-8 shadow-sm">
-          <Activity className="w-12 h-12 text-cyan-600" />
+      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-4xl mx-auto py-12">
+        <div className="mx-auto w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-8 shadow-sm">
+          <Activity className="w-12 h-12 text-red-600" />
         </div>
         
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
@@ -18,19 +18,19 @@ export function LandingPage({ onDemo }) {
           Instantly connect critical patients with live blood supplies, coordinate autonomous drone telemetry, and ensure rapid, life-saving delivery.
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md mx-auto">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-lg mx-auto">
           <button
-            onClick={() => alert('Authentication not yet configured.')}
-            className="flex-1 px-8 py-4 bg-slate-900 text-white rounded-xl font-bold shadow hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+            onClick={onRegisterDonor}
+            className="flex-1 px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2"
           >
-            Sign Up / Login <ArrowRight className="w-5 h-5" />
+            <Activity className="w-5 h-5" /> Register as Donor
           </button>
           
           <button
             onClick={onDemo}
-            className="flex-1 px-8 py-4 bg-white border border-slate-300 text-slate-900 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-4 bg-white border border-slate-300 text-slate-900 rounded-xl font-bold shadow-sm hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
           >
-            <Play className="w-5 h-5" /> Try Demo
+            <Play className="w-5 h-5 text-slate-700" /> Launch Dashboard
           </button>
         </div>
       </main>

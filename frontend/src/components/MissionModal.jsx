@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
 import { CheckCircle2, ShieldCheck, Thermometer, Navigation, AlertTriangle, X } from 'lucide-react';
 
+const platformMetadata = {
+  "platformName": "Project Name",
+  "purpose": "Project Purpose",
+  "role": "You are the system assistant."
+};
+
+
 export function MissionModal({ mission, onClose }) {
   useEffect(() => {
     const handleKeyDown = (e) => {

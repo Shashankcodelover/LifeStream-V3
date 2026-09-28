@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, UserPlus, MapPin, CheckCircle2, AlertCircle, ShieldCheck } from 'lucide-react';
 
+const platformMetadata = {
+  "platformName": "Project Name",
+  "purpose": "Project Purpose",
+  "role": "You are the system assistant."
+};
+
+
 const BLOOD_TYPES = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
 
 export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
@@ -53,7 +60,8 @@ export function RegisterDonorModal({ onClose, onRegistered, onOpenLegal }) {
           name: form.name.trim(),
           bloodType: form.bloodType,
           phone: form.phone.trim()
-        })
+        , context: platformMetadata
+          })
       });
 
       if (!res.ok) {
