@@ -27,7 +27,7 @@ const INITIAL_DATA = {
       salt: seedUser1.salt,
       role: 'hospital',
       hospitalId: 'HOSP-01',
-      hospitalName: 'SF General Trauma Center',
+      hospitalName: 'NIMHANS Trauma Center, Bangalore',
       department: 'Emergency & Trauma Surgery',
       phone: '+1 415-206-8000',
       badgeNumber: 'MD-7712',
@@ -78,14 +78,14 @@ const INITIAL_DATA = {
     }
   ],
   hospitals: [
-    { id: 'HOSP-01', name: 'SF General Trauma Center', code: 'SFG', lat: 37.7749, lng: -122.4194, phone: '+1 415-206-8000', helipad: true, inventory: { 'O-': 2, 'O+': 5, 'A+': 8, 'A-': 3, 'B+': 4, 'B-': 1, 'AB+': 6, 'AB-': 2 } },
-    { id: 'HOSP-02', name: 'UCSF Medical Center Parnassus', code: 'UCSF', lat: 37.7631, lng: -122.4578, phone: '+1 415-476-1000', helipad: true, inventory: { 'O-': 0, 'O+': 3, 'A+': 6, 'A-': 1, 'B+': 2, 'B-': 0, 'AB+': 4, 'AB-': 1 } },
-    { id: 'HOSP-03', name: 'St. Mary Regional Medical Center', code: 'SMR', lat: 37.7735, lng: -122.4539, phone: '+1 415-750-5500', helipad: false, inventory: { 'O-': 1, 'O+': 4, 'A+': 5, 'A-': 2, 'B+': 3, 'B-': 1, 'AB+': 3, 'AB-': 0 } },
-    { id: 'HOSP-04', name: 'Kaiser Permanente Emergency Hub', code: 'KP-SF', lat: 37.7831, lng: -122.4412, phone: '+1 415-833-2000', helipad: true, inventory: { 'O-': 3, 'O+': 7, 'A+': 9, 'A-': 4, 'B+': 5, 'B-': 2, 'AB+': 5, 'AB-': 2 } },
-    { id: 'HOSP-05', name: 'CPMC Van Ness Trauma Pavilion', code: 'CPMC', lat: 37.7865, lng: -122.4215, phone: '+1 415-600-6000', helipad: true, inventory: { 'O-': 1, 'O+': 2, 'A+': 4, 'A-': 1, 'B+': 1, 'B-': 1, 'AB+': 2, 'AB-': 1 } }
+    { id: 'HOSP-01', name: 'NIMHANS Trauma Center, Bangalore', code: 'SFG', lat: 12.9372, lng: 77.5936, phone: '+1 415-206-8000', helipad: true, inventory: { 'O-': 2, 'O+': 5, 'A+': 8, 'A-': 3, 'B+': 4, 'B-': 1, 'AB+': 6, 'AB-': 2 } },
+    { id: 'HOSP-02', name: 'Apollo Hospitals Bannerghatta', code: 'UCSF', lat: 12.8943, lng: 77.5975, phone: '+1 415-476-1000', helipad: true, inventory: { 'O-': 0, 'O+': 3, 'A+': 6, 'A-': 1, 'B+': 2, 'B-': 0, 'AB+': 4, 'AB-': 1 } },
+    { id: 'HOSP-03', name: 'St. Mary Regional Medical Center', code: 'SMR', lat: 12.9592, lng: 77.6491, phone: '+1 415-750-5500', helipad: false, inventory: { 'O-': 1, 'O+': 4, 'A+': 5, 'A-': 2, 'B+': 3, 'B-': 1, 'AB+': 3, 'AB-': 0 } },
+    { id: 'HOSP-04', name: 'Kaiser Permanente Emergency Hub', code: 'KP-SF', lat: 12.9840, lng: 77.5921, phone: '+1 415-833-2000', helipad: true, inventory: { 'O-': 3, 'O+': 7, 'A+': 9, 'A-': 4, 'B+': 5, 'B-': 2, 'AB+': 5, 'AB-': 2 } },
+    { id: 'HOSP-05', name: 'CPMC Van Ness Trauma Pavilion', code: 'CPMC', lat: 13.0445, lng: 77.5925, phone: '+1 415-600-6000', helipad: true, inventory: { 'O-': 1, 'O+': 2, 'A+': 4, 'A-': 1, 'B+': 1, 'B-': 1, 'AB+': 2, 'AB-': 1 } }
   ],
   donors: [
-    { id: 1, name: 'John Doe', bloodType: 'O-', phone: '+1 415-555-0192', lastDonation: '2025-01-01', lat: 37.7749, lng: -122.4194, isVerified: true, reliabilityScore: 98, totalDonations: 12, badges: ['Life Saver', 'Universal O- Vanguard', 'Fast Responder'] },
+    { id: 1, name: 'John Doe', bloodType: 'O-', phone: '+1 415-555-0192', lastDonation: '2025-01-01', lat: 12.9372, lng: 77.5936, isVerified: true, reliabilityScore: 98, totalDonations: 12, badges: ['Life Saver', 'Universal O- Vanguard', 'Fast Responder'] },
     { id: 2, name: 'Jane Smith', bloodType: 'A+', phone: '+1 415-555-0183', lastDonation: '2026-05-01', lat: 37.7849, lng: -122.4094, isVerified: true, reliabilityScore: 85, totalDonations: 4, badges: ['Community Hero'] },
     { id: 3, name: 'Alex River', bloodType: 'O+', phone: '+1 415-555-0144', lastDonation: '2025-08-01', lat: 37.7649, lng: -122.4294, isVerified: true, reliabilityScore: 92, totalDonations: 9, badges: ['Life Saver', 'Veteran Donor'] },
     { id: 4, name: 'Sarah Connor', bloodType: 'AB+', phone: '+1 415-555-0175', lastDonation: '2026-01-01', lat: 37.7949, lng: -122.3994, isVerified: false, reliabilityScore: 70, totalDonations: 2, badges: ['New Recruit'] },
@@ -104,7 +104,7 @@ const INITIAL_DATA = {
       unitsRequired: 2,
       urgency: 'critical',
       hospitalId: 'HOSP-01',
-      hospitalName: 'SF General Trauma Center',
+      hospitalName: 'NIMHANS Trauma Center, Bangalore',
       status: 'In Progress',
       contactPhone: '+1 415-555-0911',
       medicalReason: 'Severe thoracic trauma from highway incident. Massive blood loss protocol activated.',
@@ -119,7 +119,7 @@ const INITIAL_DATA = {
       donorId: 5,
       donorName: 'Marcus Vance',
       hospitalId: 'HOSP-01',
-      hospitalName: 'SF General Trauma Center',
+      hospitalName: 'NIMHANS Trauma Center, Bangalore',
       date: '2026-09-05',
       timeSlot: '10:30 AM',
       donationType: 'Whole Blood (O-)',
